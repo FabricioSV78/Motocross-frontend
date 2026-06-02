@@ -40,6 +40,7 @@ export function ReservationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [detail, setDetail] = useState<ReservationDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [cancelling, setCancelling] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -78,6 +79,29 @@ export function ReservationDetailPage() {
     );
   }
 
+  const cancellable = canCancelReservation(detail);
+
+  const handleCancel = async () => {
+    const confirmed = window.confirm(
+      `Cancel your booking at ${detail.track.name} on ${formatDate(detail.reservationDate)}?`
+    );
+    if (!confirmed) return;
+
+    try {
+      setCancelling(true);
+      setError(null);
+      await reservationService.cancelReservation(detail.id);
+      setDetail((prev) => (prev ? { ...prev, status: 'CANCELLED' } : prev));
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ??
+        'Could not cancel this booking.';
+      setError(msg);
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto">
       <PageHeader
@@ -87,6 +111,12 @@ export function ReservationDetailPage() {
       />
 
       <div className="bg-gray-800/40 border border-gray-700/80 rounded-2xl overflow-hidden">
+        {error && (
+          <div className="m-6 mb-0 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {error}
+          </div>
+        )}
+
         <div className="p-6 border-b border-gray-700/80">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-500 mb-4">
             Session details
@@ -134,9 +164,28 @@ export function ReservationDetailPage() {
             View track
           </Button>
         </Link>
+        {cancellable && (
+          <div className="flex-1">
+            <Button
+              variant="danger"
+              fullWidth
+              onClick={handleCancel}
+              isLoading={cancelling}
+              disabled={cancelling}
+            >
+              Cancel booking
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
+}
+
+function canCancelReservation(detail: ReservationDetail) {
+  if (detail.status === 'CANCELLED' || detail.status === 'COMPLETED') return false;
+  const start = new Date(`${detail.reservationDate}T${detail.startTime}`);
+  return start > new Date();
 }
 
 function InfoItem({ label, value }: { label: string; value: string }) {

@@ -147,6 +147,12 @@ export interface ReservationListItem {
   coachName?: string;
   pilotName?: string;
   coachEarnings?: number;
+  participants: number;
+  pilotType?: PilotCategoryType;
+  classType?: string;
+  classMode?: string;
+  trackPrice?: number;
+  coachPrice?: number;
   reservationDate: string;
   startTime: string;
   endTime: string;
@@ -172,4 +178,10 @@ export interface ReservationDetail {
   status: ReservationStatusType;
   payment?: PaymentDetail;
   createdAt: string;
+}
+
+export interface CancelReservationResponse {
+  reservation_id: number;
+  status: ReservationStatusType;
+  message: string;
 }

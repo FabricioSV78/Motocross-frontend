@@ -26,6 +26,7 @@ export function MyReservationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [cancellingId, setCancellingId] = useState<number | null>(null);
 
   useEffect(() => {
     loadReservations();
@@ -57,6 +58,31 @@ export function MyReservationsPage() {
       return matchesStatus && matchesSearch;
     });
   }, [reservations, search, statusFilter]);
+
+  const handleCancel = async (reservation: ReservationRow) => {
+    const confirmed = window.confirm(
+      `Cancel your booking at ${reservation.trackName} on ${formatDate(reservation.reservationDate)}?`
+    );
+    if (!confirmed) return;
+
+    try {
+      setCancellingId(reservation.id);
+      setError(null);
+      await reservationService.cancelReservation(reservation.id);
+      setReservations((prev) =>
+        prev.map((item) =>
+          item.id === reservation.id ? { ...item, status: 'CANCELLED' } : item
+        )
+      );
+    } catch (err: unknown) {
+      const detail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ??
+        'Could not cancel this reservation. Please try again.';
+      setError(detail);
+    } finally {
+      setCancellingId(null);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -134,7 +160,12 @@ export function MyReservationsPage() {
       {!loading && filtered.length > 0 && (
         <div className="space-y-3">
           {filtered.map((reservation) => (
-            <ReservationCard key={reservation.id} reservation={reservation} />
+            <ReservationCard
+              key={reservation.id}
+              reservation={reservation}
+              cancelling={cancellingId === reservation.id}
+              onCancel={handleCancel}
+            />
           ))}
         </div>
       )}
@@ -142,7 +173,17 @@ export function MyReservationsPage() {
   );
 }
 
-function ReservationCard({ reservation }: { reservation: ReservationRow }) {
+function ReservationCard({
+  reservation,
+  cancelling,
+  onCancel,
+}: {
+  reservation: ReservationRow;
+  cancelling: boolean;
+  onCancel: (reservation: ReservationRow) => void;
+}) {
+  const cancellable = canCancelReservation(reservation);
+
   return (
     <article className="bg-gray-800/40 border border-gray-700/80 rounded-xl p-5 hover:border-gray-600 transition-colors">
       <div className="flex flex-col gap-4">
@@ -189,8 +230,30 @@ function ReservationCard({ reservation }: { reservation: ReservationRow }) {
               Complete payment
             </Button>
           )}
+          {cancellable && (
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => onCancel(reservation)}
+              isLoading={cancelling}
+              disabled={cancelling}
+            >
+              Cancel booking
+            </Button>
+          )}
+          {reservation.status === 'CANCELLED' && (
+            <span className="rounded-lg border border-gray-700 bg-gray-900/60 px-3 py-1.5 text-sm text-gray-400">
+              Cancelled by rider
+            </span>
+          )}
         </div>
       </div>
     </article>
   );
+}
+
+function canCancelReservation(reservation: ReservationRow) {
+  if (reservation.status === 'CANCELLED' || reservation.status === 'COMPLETED') return false;
+  const start = new Date(`${reservation.reservationDate}T${reservation.startTime}`);
+  return start > new Date();
 }

@@ -11,6 +11,7 @@ import type {
   PaymentIntentResponse,
   ReservationListItem,
   ReservationDetail,
+  CancelReservationResponse,
 } from '@/types/reservation.types';
 
 export const reservationService = {
@@ -156,6 +157,17 @@ export const reservationService = {
   },
 
   /**
+   * Cancelar una reserva propia del piloto
+   * PATCH /reservations/{id}/cancel
+   */
+  async cancelReservation(reservationId: number): Promise<CancelReservationResponse> {
+    const response = await apiClient.patch<CancelReservationResponse>(
+      `/reservations/${reservationId}/cancel`
+    );
+    return response.data;
+  },
+
+  /**
    * Obtener todas las reservas del coach autenticado
    * GET /reservations/coach/mine
    */
@@ -182,7 +194,7 @@ export const reservationService = {
    * POST /webhooks/stripe
    * NO se usa desde frontend, pero aquí para referencia
    */
-  async notifyStripePayment(event: any): Promise<any> {
+  async notifyStripePayment(event: unknown): Promise<unknown> {
     const response = await apiClient.post('/webhooks/stripe', event);
     return response.data;
   },
