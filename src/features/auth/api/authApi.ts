@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/axios';
+import { clearAuthStorage, setAuthToken } from '@/lib/authStorage';
 import type { User } from '@/types/user.types';
 import { AxiosError } from 'axios';
 
@@ -155,7 +156,7 @@ export const authApi = {
       
       // Guardar token en localStorage
       if (response.data.token) {
-        localStorage.setItem('auth_token', response.data.token);
+        setAuthToken(response.data.token);
       }
       
       return response.data;
@@ -182,8 +183,7 @@ export const authApi = {
       console.error('Error during logout:', error);
     } finally {
       // Siempre remover el token y usuario localmente
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
+      clearAuthStorage();
     }
   },
 

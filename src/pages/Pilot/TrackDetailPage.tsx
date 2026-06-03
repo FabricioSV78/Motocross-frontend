@@ -5,6 +5,7 @@ import { getTrackDetailPublic, type TrackDetailPublic } from '@/services/trackSe
 import { ROUTES } from '@/router/routes';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/common';
+import { TrackPhotoCarousel } from '@/components/tracks/TrackPhotoCarousel';
 const DIFFICULTY: Record<string, { label: string; className: string }> = {
   BEGINNER: { label: 'Beginner', className: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
   INTERMEDIATE: { label: 'Intermediate', className: 'bg-amber-500/15 text-amber-300 border-amber-500/30' },
@@ -75,15 +76,7 @@ export function TrackDetailPage() {
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Contenido principal */}
         <div className="lg:col-span-2 space-y-6">
-          {track.photos?.[0] && (
-            <div className="rounded-2xl overflow-hidden border border-gray-700/80 aspect-[21/9] bg-gray-800">
-              <img
-                src={track.photos[0]}
-                alt={track.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
+          <TrackPhotoCarousel photos={track.photos} trackName={track.name} />
 
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">

@@ -4,8 +4,8 @@ import { LoginForm } from '../components/LoginForm';
 import { AuthLayout, AuthCard } from '../components/AuthLayout';
 import { AuthAlert } from '../components/AuthAlert';
 import { authApi, type UserRole } from '../api/authApi';
+import { setStoredAuthUser } from '@/lib/authStorage';
 import { ROUTES } from '@/router/routes';
-import { APP_CONFIG } from '@/config/app';
 import { useAuth } from '@/providers/useAuth';
 import type { LoginFormData } from '../schemas/login.schema';
 
@@ -45,13 +45,12 @@ export function LoginPage() {
         password: data.password,
       });
 
-      localStorage.setItem(APP_CONFIG.auth.tokenKey, response.token);
       const userInfo = {
         id: response.user.id.toString(),
         email: response.user.email,
         role: response.role,
       };
-      localStorage.setItem(APP_CONFIG.auth.userKey, JSON.stringify(userInfo));
+      setStoredAuthUser(userInfo);
       updateUser(userInfo);
 
       navigate(getRedirectRoute(response.role, response.status), { replace: true });

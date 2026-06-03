@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { env } from '@/config/env';
+import { clearAuthStorage, getAuthToken } from '@/lib/authStorage';
 
 /**
  * Instancia configurada de Axios para todas las peticiones API
@@ -17,7 +18,7 @@ export const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('auth_token');
+    const token = getAuthToken();
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -48,7 +49,7 @@ apiClient.interceptors.response.use(
           const url = error.config?.url ?? '';
           const isAuthEndpoint = url.includes('/auth/login');
           if (!isAuthEndpoint) {
-            localStorage.removeItem('auth_token');
+            clearAuthStorage();
             window.location.href = '/login';
           }
           break;
@@ -59,8 +60,7 @@ apiClient.interceptors.response.use(
           const url403 = error.config?.url ?? '';
           const isAuthEndpoint403 = url403.includes('/auth/login');
           if (!isAuthEndpoint403) {
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('auth_user');
+            clearAuthStorage();
             window.location.href = '/login';
           }
           break;

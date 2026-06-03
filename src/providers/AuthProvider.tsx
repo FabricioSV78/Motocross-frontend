@@ -1,7 +1,14 @@
 import { createContext, useState, useEffect, type ReactNode } from 'react';
-import { APP_CONFIG } from '@/config/app';
 import { authApi } from '@/features/auth/api/authApi';
 import type { UserRole } from '@/features/auth/types';
+import {
+  clearAuthStorage,
+  getAuthToken,
+  getStoredAuthUser,
+  removeAuthToken,
+  removeStoredAuthUser,
+  setStoredAuthUser,
+} from '@/lib/authStorage';
 import { queryClient } from '@/lib/react-query';
 
 /**
@@ -38,16 +45,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Verificar si hay sesión guardada al montar
   useEffect(() => {
-    const token = localStorage.getItem(APP_CONFIG.auth.tokenKey);
-    const savedUser = localStorage.getItem(APP_CONFIG.auth.userKey);
+    const token = getAuthToken();
+    const savedUser = getStoredAuthUser();
 
     if (token && savedUser) {
       try {
         setUser(JSON.parse(savedUser));
       } catch (error) {
         console.error('Error parsing user data:', error);
-        localStorage.removeItem(APP_CONFIG.auth.tokenKey);
-        localStorage.removeItem(APP_CONFIG.auth.userKey);
+        removeAuthToken();
+        removeStoredAuthUser();
       }
     }
 
@@ -62,8 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Error during logout:', error);
     } finally {
       // Siempre limpiar el estado local
-      localStorage.removeItem(APP_CONFIG.auth.tokenKey);
-      localStorage.removeItem(APP_CONFIG.auth.userKey);
+      clearAuthStorage();
       setUser(null);
 
       // Limpiar toda la caché de React Query para que el próximo usuario
@@ -77,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateUser = (updatedUser: User) => {
     setUser(updatedUser);
-    localStorage.setItem(APP_CONFIG.auth.userKey, JSON.stringify(updatedUser));
+    setStoredAuthUser(updatedUser);
   };
 
   const value: AuthContextType = {

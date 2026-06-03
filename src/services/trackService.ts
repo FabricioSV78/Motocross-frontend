@@ -1,4 +1,5 @@
 import { apiClient } from '@/services/apiClient';
+import { getAuthToken } from '@/lib/authStorage';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -183,7 +184,7 @@ export async function uploadTrackPhoto(file: File): Promise<string> {
   const formData = new FormData();
   formData.append('file', file);
 
-  const token = localStorage.getItem('auth_token');
+  const token = getAuthToken();
   const baseUrl = (apiClient.defaults.baseURL ?? '').replace(/\/$/, '');
 
   const response = await fetch(`${baseUrl}/tracks/upload-photo`, {

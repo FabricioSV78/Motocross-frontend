@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/providers/useAuth';
 import { LogoutButton } from '@/features/auth/components/LogoutButton';
 import { ROUTES } from '@/router/routes';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { clsx } from 'clsx';
 
 const PILOT_LINKS = [
@@ -63,7 +64,7 @@ export function Navbar() {
     user.role === 'PILOT' || user.role === 'COACH' || user.role === 'COMPANY';
 
   return (
-    <nav className="bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 sticky top-0 z-50">
+    <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 shadow-sm backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90 dark:shadow-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link
@@ -140,12 +141,14 @@ export function Navbar() {
               </Link>
             )}
 
+            <ThemeToggle compact className="hidden sm:inline-flex" />
+
             <LogoutButton variant="outline" />
 
             {mobileRole && (
               <button
                 type="button"
-                className="md:hidden p-2 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"
+                className="rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950 md:hidden dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                 aria-expanded={mobileOpen}
                 aria-label="Open menu"
                 onClick={() => setMobileOpen((o) => !o)}
@@ -205,7 +208,10 @@ function MobileMenu({
   cta: { to: string; label: string };
 }) {
   return (
-    <div className="md:hidden border-t border-gray-800 py-3 space-y-1">
+    <div className="space-y-1 border-t border-slate-200 py-3 dark:border-slate-800 md:hidden">
+      <div className="px-3 pb-2">
+        <ThemeToggle className="w-full justify-center" />
+      </div>
       {links.map(({ to, label }) => (
         <Link
           key={to}
@@ -214,8 +220,8 @@ function MobileMenu({
           className={clsx(
             'block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
             isActive(pathname, to)
-              ? 'bg-orange-500/15 text-orange-400'
-              : 'text-gray-300 hover:bg-gray-800'
+              ? 'bg-orange-500/15 text-orange-600 dark:text-orange-400'
+              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
           )}
         >
           {label}
@@ -247,8 +253,8 @@ function NavLink({
       className={clsx(
         'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
         active
-          ? 'bg-orange-500/15 text-orange-400'
-          : 'text-gray-300 hover:text-white hover:bg-gray-800/80'
+          ? 'bg-orange-500/15 text-orange-600 dark:text-orange-400'
+          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-white'
       )}
     >
       {children}

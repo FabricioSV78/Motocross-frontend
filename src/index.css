@@ -214,3 +214,223 @@ html {
   background-color: #ea580c;
   color: white;
 }
+
+/* ===== THEME SYSTEM ===== */
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background: #f8fafc;
+  color: #0f172a;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+html.dark body {
+  background: #020617;
+  color: #f8fafc;
+}
+
+html:not(.dark) ::-webkit-scrollbar-track {
+  background: #e2e8f0;
+}
+
+html:not(.dark) .theme-on-accent,
+html:not(.dark) .theme-on-accent *,
+html:not(.dark) .theme-fixed-dark,
+html:not(.dark) .theme-fixed-dark *,
+html:not(.dark) .bg-orange-500.text-white,
+html:not(.dark) .bg-orange-600.text-white,
+html:not(.dark) .bg-red-500.text-white,
+html:not(.dark) .bg-red-600.text-white,
+html:not(.dark) .bg-emerald-600.text-white,
+html:not(.dark) .from-orange-500.text-white,
+html:not(.dark) .from-orange-600.text-white {
+  color: #fff !important;
+}
+
+/* Legacy dark-class bridge: keeps older screens readable in light mode. */
+html:not(.dark) .bg-black,
+html:not(.dark) .bg-gray-950,
+html:not(.dark) .bg-slate-950,
+html:not(.dark) .bg-neutral-950 {
+  background-color: #ffffff !important;
+}
+
+html:not(.dark) .bg-gray-900,
+html:not(.dark) .bg-slate-900,
+html:not(.dark) .bg-neutral-900,
+html:not(.dark) .bg-gray-900\/40,
+html:not(.dark) .bg-gray-900\/50,
+html:not(.dark) .bg-gray-900\/60,
+html:not(.dark) .bg-gray-900\/70,
+html:not(.dark) .bg-gray-900\/80,
+html:not(.dark) .bg-gray-950\/80,
+html:not(.dark) .bg-slate-950\/70,
+html:not(.dark) .bg-neutral-950\/70 {
+  background-color: rgba(248, 250, 252, 0.92) !important;
+}
+
+html:not(.dark) .bg-gray-800,
+html:not(.dark) .bg-slate-800,
+html:not(.dark) .bg-gray-800\/20,
+html:not(.dark) .bg-gray-800\/30,
+html:not(.dark) .bg-gray-800\/40,
+html:not(.dark) .bg-gray-800\/50,
+html:not(.dark) .bg-gray-800\/80,
+html:not(.dark) .bg-slate-800\/90 {
+  background-color: rgba(255, 255, 255, 0.86) !important;
+}
+
+html:not(.dark) .border-gray-600,
+html:not(.dark) .border-gray-700,
+html:not(.dark) .border-gray-700\/50,
+html:not(.dark) .border-gray-700\/60,
+html:not(.dark) .border-gray-700\/70,
+html:not(.dark) .border-gray-700\/80,
+html:not(.dark) .border-gray-800,
+html:not(.dark) .border-gray-800\/80,
+html:not(.dark) .border-slate-700,
+html:not(.dark) .border-slate-800,
+html:not(.dark) .border-white\/10,
+html:not(.dark) .border-white\/15,
+html:not(.dark) .border-white\/20,
+html:not(.dark) .border-white\/25 {
+  border-color: rgba(203, 213, 225, 0.9) !important;
+}
+
+html:not(.dark) .text-white,
+html:not(.dark) .text-gray-100,
+html:not(.dark) .text-gray-200,
+html:not(.dark) .text-slate-100,
+html:not(.dark) .text-slate-200,
+html:not(.dark) .text-neutral-100 {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .text-gray-300,
+html:not(.dark) .text-slate-300,
+html:not(.dark) .text-neutral-300 {
+  color: #334155 !important;
+}
+
+html:not(.dark) .text-gray-400,
+html:not(.dark) .text-gray-500,
+html:not(.dark) .text-slate-400,
+html:not(.dark) .text-neutral-400,
+html:not(.dark) .text-neutral-500 {
+  color: #64748b !important;
+}
+
+html:not(.dark) input,
+html:not(.dark) textarea,
+html:not(.dark) select {
+  color: #0f172a;
+}
+
+html:not(.dark) option {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+html:not(.dark) .theme-on-accent,
+html:not(.dark) .theme-on-accent * {
+  color: #fff !important;
+}
+
+html:not(.dark) .bg-orange-500.text-white,
+html:not(.dark) .bg-orange-600.text-white,
+html:not(.dark) .bg-red-500.text-white,
+html:not(.dark) .bg-red-600.text-white,
+html:not(.dark) .bg-emerald-600.text-white,
+html:not(.dark) .from-orange-500.text-white,
+html:not(.dark) .from-orange-600.text-white {
+  color: #fff !important;
+}
+
+/* ===== LEAFLET MAP THEME ===== */
+.track-map {
+  background: #e2e8f0;
+}
+
+html.dark .track-map {
+  background: #0f172a;
+}
+
+.track-map .leaflet-control-zoom {
+  border: 0;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+}
+
+.track-map .leaflet-control-zoom a {
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  background: rgba(255, 255, 255, 0.94);
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.track-map .leaflet-control-zoom a:first-child {
+  border-radius: 14px 14px 0 0;
+}
+
+.track-map .leaflet-control-zoom a:last-child {
+  border-radius: 0 0 14px 14px;
+}
+
+.track-map .leaflet-control-attribution {
+  border-radius: 999px 0 0 0;
+  background: rgba(255, 255, 255, 0.86);
+  color: #475569;
+  font-size: 10px;
+}
+
+html.dark .track-map .leaflet-control-zoom a {
+  border-color: rgba(51, 65, 85, 0.95);
+  background: rgba(15, 23, 42, 0.94);
+  color: #f8fafc;
+}
+
+html.dark .track-map .leaflet-control-attribution {
+  background: rgba(2, 6, 23, 0.82);
+  color: #94a3b8;
+}
+
+.track-map-popup .leaflet-popup-content-wrapper {
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.22);
+}
+
+.track-map-popup .leaflet-popup-content {
+  margin: 14px;
+}
+
+.track-map-popup .leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.97);
+}
+
+html.dark .track-map-popup .leaflet-popup-content-wrapper {
+  border-color: rgba(51, 65, 85, 0.95);
+  background: rgba(15, 23, 42, 0.98);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.42);
+}
+
+html.dark .track-map-popup .leaflet-popup-tip {
+  background: rgba(15, 23, 42, 0.98);
+}
+
+.marker-cluster div {
+  border: 3px solid #ffffff;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.28);
+}
+
+html.dark .marker-cluster div {
+  border-color: #0f172a;
+}

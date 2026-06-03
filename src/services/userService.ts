@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/axios';
+import { getAuthToken } from '@/lib/authStorage';
 import type { UserProfile, UpdateProfileData } from '@/types/profile.types';
 import type { User } from '@/types/user.types';
 import { AxiosError } from 'axios';
@@ -129,7 +130,7 @@ export const userService = {
     formData.append('tipo', tipo);
     formData.append('file', file);
 
-    const token = localStorage.getItem('auth_token');
+    const token = getAuthToken();
     const baseUrl = (apiClient.defaults.baseURL ?? '').replace(/\/$/, '');
 
     const response = await fetch(`${baseUrl}/users/me/upload-photo`, {

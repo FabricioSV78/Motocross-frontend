@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { ROUTES } from '@/router/routes';
 
 const riderSteps = [
@@ -44,7 +45,7 @@ export const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
-    <main className="min-h-screen bg-black text-neutral-100">
+    <main className="min-h-screen bg-white text-slate-950 transition-colors duration-300 dark:bg-black dark:text-neutral-100">
       <Hero onNavigate={navigate} />
 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
@@ -77,7 +78,7 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      <section className="border-y border-white/10 bg-neutral-950 text-white">
+      <section className="border-y border-slate-200 bg-slate-50 text-slate-950 dark:border-white/10 dark:bg-neutral-950 dark:text-white">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-2xl">
             <p className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-orange-300">
@@ -196,7 +197,7 @@ export const LandingPage = () => {
 
 function Hero({ onNavigate }: { onNavigate: (path: string) => void }) {
   return (
-    <section className="relative min-h-[86svh] overflow-hidden">
+    <section className="theme-fixed-dark relative min-h-[86svh] overflow-hidden">
       <img
         src="/images/motocross.jpg"
         alt="Motocross rider jumping on a dirt track"
@@ -214,6 +215,7 @@ function Hero({ onNavigate }: { onNavigate: (path: string) => void }) {
             Motocross<span className="text-orange-400">App</span>
           </button>
           <div className="flex items-center gap-2">
+            <ThemeToggle compact className="border-white/20 bg-black/30 text-white hover:border-orange-400 hover:text-orange-300 dark:border-white/20 dark:bg-black/30 dark:text-white" />
             <button
               type="button"
               onClick={() => onNavigate(ROUTES.LOGIN)}
