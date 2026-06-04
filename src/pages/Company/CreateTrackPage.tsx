@@ -5,6 +5,7 @@ import { createTrack, uploadTrackPhoto } from '@/services/trackService';
 import type { TrackCreatePayload, DifficultyLevel } from '@/services/trackService';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { SelectField } from '@/components/ui';
 import { PageHeader } from '@/components/pilot';
 import { TrackLocationPicker, TrackPhotosUpload } from '@/components/company';
 import { ROUTES } from '@/router/routes';
@@ -140,17 +141,13 @@ export function CreateTrackPage() {
             <label className="text-sm font-medium text-gray-200">
               Difficulty <span className="text-orange-400">*</span>
             </label>
-            <select
+            <SelectField
               value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value as DifficultyLevel)}
+              onChange={(value) => setDifficulty(value as DifficultyLevel)}
               className={`${textareaClass} mt-1.5`}
-            >
-              {DIFFICULTY_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
+              options={DIFFICULTY_OPTIONS}
+              ariaLabel="Difficulty"
+            />
           </div>
           <Input
             label="Capacity (riders)"

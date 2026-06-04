@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/common';
 import { PageHeader, StatusBadge } from '@/components/pilot';
 import type { ReservationDetail } from '@/types/reservation.types';
+import { getReservationDisplayStatus } from '@/utils/reservationFields';
 
 function normalizeDetail(raw: Record<string, unknown>): ReservationDetail {
   const track = (raw.track ?? {}) as Record<string, unknown>;
@@ -31,7 +32,11 @@ function normalizeDetail(raw: Record<string, unknown>): ReservationDetail {
     trackPrice: (raw.track_price ?? raw.trackPrice) as number,
     coachPrice: (raw.coach_price ?? raw.coachPrice) as number | undefined,
     totalAmount: (raw.total_amount ?? raw.totalAmount) as number,
-    status: (raw.status as ReservationDetail['status']) ?? 'CONFIRMED',
+    status: getReservationDisplayStatus(
+      raw.status,
+      (raw.reservation_date ?? raw.reservationDate) as string,
+      (raw.end_time ?? raw.endTime) as string
+    ),
     createdAt: (raw.created_at ?? raw.createdAt) as string,
   };
 }
@@ -156,7 +161,7 @@ export function ReservationDetailPage() {
       <div className="mt-6 flex flex-col sm:flex-row gap-3">
         <Link to={ROUTES.RESERVATIONS} className="flex-1">
           <Button variant="outline" fullWidth>
-            ← All reservations
+            All reservations
           </Button>
         </Link>
         <Link to={ROUTES.TRACK_DETAIL(String(detail.track.id))} className="flex-1">
@@ -183,7 +188,7 @@ export function ReservationDetailPage() {
 }
 
 function canCancelReservation(detail: ReservationDetail) {
-  if (detail.status === 'CANCELLED' || detail.status === 'COMPLETED') return false;
+  if (detail.status !== 'CONFIRMED') return false;
   const start = new Date(`${detail.reservationDate}T${detail.startTime}`);
   return start > new Date();
 }

@@ -11,27 +11,32 @@ export function RegisterPage() {
   const [selectedRole, setSelectedRole] = useState<RoleOption>(null);
   const navigate = useNavigate();
 
+  const footer = (label: string) => (
+    <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+      {label}{' '}
+      <Link
+        to={ROUTES.LOGIN}
+        className="font-semibold text-orange-600 transition-colors hover:text-orange-500 dark:text-orange-300 dark:hover:text-orange-200"
+      >
+        Sign in
+      </Link>
+    </p>
+  );
+
   if (selectedRole === 'PILOT') {
     return (
       <AuthLayout
         title="Create rider account"
         subtitle="Book tracks and lessons in a few steps."
         maxWidth="md"
-        footer={
-          <p className="text-center text-gray-500 text-sm mt-8">
-            Already registered?{' '}
-            <Link to={ROUTES.LOGIN} className="text-orange-400 hover:text-orange-300 font-medium">
-              Sign in
-            </Link>
-          </p>
-        }
+        footer={footer('Already registered?')}
       >
         <button
           type="button"
           onClick={() => setSelectedRole(null)}
-          className="text-sm text-gray-400 hover:text-orange-400 mb-4 transition-colors"
+          className="mb-4 text-sm font-semibold text-slate-500 transition-colors hover:text-orange-600 dark:text-slate-400 dark:hover:text-orange-300"
         >
-          ← Choose another account type
+          Back to account types
         </button>
         <AuthCard>
           <RegisterForm />
@@ -45,16 +50,9 @@ export function RegisterPage() {
       title="Create your account"
       subtitle="Pick how you will use the platform. You can sign in later with the same email."
       maxWidth="2xl"
-      footer={
-        <p className="text-center text-gray-500 text-sm mt-8">
-          Already have an account?{' '}
-          <Link to={ROUTES.LOGIN} className="text-orange-400 hover:text-orange-300 font-medium">
-            Sign in
-          </Link>
-        </p>
-      }
+      footer={footer('Already have an account?')}
     >
-      <div className="grid sm:grid-cols-3 gap-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         <RoleSelectCard
           title="Rider"
           description="Find tracks on the map and book sessions with or without a coach."

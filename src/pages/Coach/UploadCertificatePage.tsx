@@ -57,7 +57,7 @@ export function UploadCertificatePage() {
       setApiError(null);
       await authApi.uploadCertificate(selectedFile);
       setSuccessMessage(
-        'Certificate uploaded. Your profile is under review — we will notify you when approved.'
+        'Certificate uploaded. Your profile is under review - we will notify you when approved.'
       );
       setTimeout(() => {
         navigate(ROUTES.LOGIN, {
@@ -98,28 +98,32 @@ export function UploadCertificatePage() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">
+            <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">
               Certificate file <span className="text-orange-400">*</span>
             </label>
-            <p className="text-xs text-gray-500 mb-3">PDF or image from your computer · max {MAX_SIZE_MB} MB</p>
+            <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
+              PDF or image from your computer - max {MAX_SIZE_MB} MB
+            </p>
 
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isLoading || !!successMessage}
-              className="w-full border-2 border-dashed border-gray-600 rounded-xl p-8 text-center hover:border-orange-500/50 transition-colors disabled:opacity-50"
+              className="w-full rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/70 p-8 text-center transition-colors hover:border-orange-400 hover:bg-orange-50/60 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-950/40 dark:hover:border-orange-500/50 dark:hover:bg-orange-500/10"
             >
               {selectedFile ? (
                 <div>
-                  <p className="text-white font-medium text-sm">{selectedFile.name}</p>
-                  <p className="text-gray-500 text-xs mt-1">
+                  <p className="text-sm font-semibold text-slate-950 dark:text-white">{selectedFile.name}</p>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                     {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                   </p>
-                  <span className="text-orange-400 text-xs mt-2 inline-block">Change file</span>
+                  <span className="mt-2 inline-block text-xs font-semibold text-orange-600 dark:text-orange-300">
+                    Change file
+                  </span>
                 </div>
               ) : (
-                <div className="text-gray-500">
-                  <p className="text-white font-medium text-sm mb-1">Click to choose file</p>
+                <div className="text-slate-500 dark:text-slate-400">
+                  <p className="mb-1 text-sm font-semibold text-slate-950 dark:text-white">Click to choose file</p>
                   <p className="text-xs">or drag and drop here</p>
                 </div>
               )}
@@ -153,8 +157,11 @@ export function UploadCertificatePage() {
         </AuthAlert>
       </div>
 
-      <p className="text-center text-gray-500 text-sm mt-6">
-        <Link to={ROUTES.LOGIN} className="text-orange-400 hover:text-orange-300">
+      <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+        <Link
+          to={ROUTES.LOGIN}
+          className="font-semibold text-orange-600 hover:text-orange-500 dark:text-orange-300 dark:hover:text-orange-200"
+        >
           Back to sign in
         </Link>
       </p>

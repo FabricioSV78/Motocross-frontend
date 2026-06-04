@@ -76,7 +76,8 @@ function createTrackIcon(track: TrackMapItem, selected: boolean, isDark: boolean
   const level = getLevelMeta(track.difficulty_level);
   const ring = selected ? '#f97316' : isDark ? '#0f172a' : '#ffffff';
   const size = selected ? 64 : 56;
-  const price = Math.round(track.price);
+  const price = formatTrackPrice(track.price);
+  const priceFontSize = price.length > 5 ? 14 : 16;
 
   return L.divIcon({
     className: '',
@@ -92,7 +93,7 @@ function createTrackIcon(track: TrackMapItem, selected: boolean, isDark: boolean
           transform:${selected ? 'translateY(-4px) scale(1.04)' : 'none'};
         ">
           <span style="font-size:11px;line-height:1;opacity:.9;">FROM</span>
-          <span style="font-size:16px;line-height:1.1;margin-top:3px;">$${price}</span>
+          <span style="font-size:${priceFontSize}px;line-height:1.1;margin-top:3px;">$${price}</span>
         </div>
         <div style="
           width:14px;height:14px;border-radius:999px;background:${level.pin};
@@ -181,21 +182,28 @@ function TrackMarkers({
             icon={createTrackIcon(track, selected, isDark)}
             eventHandlers={{ click: () => onSelect(track) }}
           >
-            <Popup minWidth={250} className="track-map-popup">
-              <div className="space-y-3">
-                <div>
-                  <p className="text-base font-bold leading-tight text-slate-950 dark:text-white">
-                    {track.name}
-                  </p>
-                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    Track preview and booking details
-                  </p>
+            <Popup minWidth={252} className="track-map-popup">
+              <div className="space-y-2 rounded-[18px] border border-slate-200 bg-white p-3 shadow-xl dark:border-slate-700 dark:bg-slate-950">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-[15px] font-bold leading-tight text-slate-950 dark:text-white">
+                      {track.name}
+                    </p>
+                  </div>
+                  <span
+                    className={clsx(
+                      'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ring-1',
+                      level.badge,
+                    )}
+                  >
+                    <span className={clsx('h-1.5 w-1.5 rounded-full', level.dot)} />
+                    {level.label}
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                  <PopupMetric label="From" value={`$${Math.round(track.price)}`} />
-                  <PopupMetric label="Rating" value={track.rating.toFixed(1)} />
-                  <PopupMetric label="Level" value={level.label.split(' ')[0]} />
+                <div className="grid grid-cols-2 gap-1.5">
+                  <PopupMetric label="From" value={`$${formatTrackPrice(track.price)}`} />
+                  <PopupMetric label="Level" value={level.label} />
                 </div>
 
                 <Button
@@ -217,11 +225,11 @@ function TrackMarkers({
 
 function PopupMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-2 dark:border-slate-700 dark:bg-slate-900/80">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-500">
+    <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/80">
+      <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
         {label}
       </p>
-      <p className="mt-0.5 font-bold text-slate-950 dark:text-white">{value}</p>
+      <p className="mt-1 text-[13px] font-black leading-tight text-slate-950 dark:text-white">{value}</p>
     </div>
   );
 }
@@ -287,14 +295,12 @@ export function MapPage() {
 
   const averagePrice = useMemo(() => {
     if (filteredTracks.length === 0) return 0;
-    return Math.round(
-      filteredTracks.reduce((sum, track) => sum + track.price, 0) / filteredTracks.length,
-    );
+    return filteredTracks.reduce((sum, track) => sum + track.price, 0) / filteredTracks.length;
   }, [filteredTracks]);
 
-  const bestRating = useMemo(() => {
-    if (filteredTracks.length === 0) return '0.0';
-    return Math.max(...filteredTracks.map((track) => track.rating)).toFixed(1);
+  const lowestPrice = useMemo(() => {
+    if (filteredTracks.length === 0) return null;
+    return Math.min(...filteredTracks.map((track) => track.price));
   }, [filteredTracks]);
 
   const difficultyCounts = useMemo(
@@ -343,8 +349,8 @@ export function MapPage() {
 
             <div className="mt-5 grid grid-cols-3 gap-2">
               <StatCard label="Shown" value={`${filteredTracks.length}/${tracks.length}`} />
-              <StatCard label="Avg price" value={averagePrice ? `$${averagePrice}` : '-'} />
-              <StatCard label="Best" value={bestRating} />
+              <StatCard label="Lowest price" value={lowestPrice != null ? `$${formatTrackPrice(lowestPrice)}` : '-'} />
+              <StatCard label="Avg price" value={averagePrice ? `$${formatTrackPrice(averagePrice)}` : '-'} />
             </div>
           </header>
 
@@ -442,7 +448,7 @@ export function MapPage() {
               <div className="mt-1 flex flex-wrap items-center gap-3 text-xs font-medium text-slate-500 dark:text-slate-400">
                 <span className="inline-flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-orange-500" />
-                  Track price pins
+                  Lowest-price pins
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-blue-600" />
@@ -570,16 +576,13 @@ function TrackResultCard({
             <h2 className="truncate text-base font-bold text-slate-950 dark:text-white">
               {track.name}
             </h2>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              From <span className="font-bold text-slate-800 dark:text-slate-200">${Math.round(track.price)}</span> USD
+            <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+              From <span className="font-bold text-slate-800 dark:text-slate-200">${formatTrackPrice(track.price)}</span> USD
             </p>
           </div>
-          <span className="rounded-full border border-orange-200 bg-orange-100 px-2.5 py-1 text-xs font-black text-orange-700 dark:border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-300">
-            {track.rating.toFixed(1)}
-          </span>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           <span className={clsx('inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ring-1', level.badge)}>
             <span className={clsx('h-1.5 w-1.5 rounded-full', level.dot)} />
             {level.label}
@@ -645,4 +648,9 @@ function TrackListSkeleton() {
       ))}
     </div>
   );
+}
+
+function formatTrackPrice(price: number) {
+  if (Number.isInteger(price)) return String(price);
+  return price.toFixed(2).replace(/\.?0+$/, '');
 }

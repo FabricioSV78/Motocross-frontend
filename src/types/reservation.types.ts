@@ -8,10 +8,9 @@
 // ============================================================================
 
 export const ReservationStatus = {
-  PENDING_PAYMENT: "PENDING_PAYMENT",
   CONFIRMED: "CONFIRMED",
   CANCELLED: "CANCELLED",
-  COMPLETED: "COMPLETED",
+  PAST: "PAST",
 } as const;
 
 export const PaymentStatus = {
@@ -65,7 +64,7 @@ export interface ReservationCalculateResponse {
   coachPrice?: number;
   totalDurationHours: number;
   subtotal: number;
-  tax: number;
+  tax?: number;
   total: number;
   currency: string;
   availabilityAvailable: boolean;

@@ -9,11 +9,14 @@ export function RegisterCompanyPage() {
     <AuthLayout
       title="Register your company"
       subtitle="List your motocross tracks and receive bookings from riders."
-      backLink={{ to: ROUTES.REGISTER, label: '← Back to account types' }}
+      backLink={{ to: ROUTES.REGISTER, label: 'Back to account types' }}
       footer={
-        <p className="text-center text-gray-500 text-sm mt-6">
+        <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
           Already have an account?{' '}
-          <Link to={ROUTES.LOGIN} className="text-orange-400 hover:text-orange-300 font-medium">
+          <Link
+            to={ROUTES.LOGIN}
+            className="font-semibold text-orange-600 hover:text-orange-500 dark:text-orange-300 dark:hover:text-orange-200"
+          >
             Sign in
           </Link>
         </p>

@@ -1,4 +1,5 @@
 import type { ClassType, ClassMode } from '@/services/coachSettingsService';
+import { SelectField } from '@/components/ui';
 
 export interface ServiceRow {
   classType: ClassType;
@@ -34,7 +35,7 @@ export function CoachSettingsServicesSection({
         <div>
           <h2 className="text-white font-semibold text-lg">Services & rates</h2>
           <p className="text-gray-500 text-sm mt-1">
-            Define how you teach and your prices. Each type/mode pair must be unique.
+            Define your 1:1 lesson types and prices.
           </p>
         </div>
         <button
@@ -54,37 +55,22 @@ export function CoachSettingsServicesSection({
         {services.map((svc, idx) => (
           <div
             key={idx}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end bg-gray-900/40 border border-gray-700/60 rounded-xl p-4"
+            className="grid grid-cols-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-3 items-end bg-gray-900/40 border border-gray-700/60 rounded-xl p-4"
           >
             <div>
               <label className="block text-xs text-gray-400 mb-1">
                 Class type <span className="text-orange-400">*</span>
               </label>
-              <select
+              <SelectField
                 value={svc.classType}
-                onChange={(e) => onUpdate(idx, 'classType', e.target.value)}
+                onChange={(value) => onUpdate(idx, 'classType', value)}
                 className={selectClass}
-              >
-                {CLASS_TYPES.map((ct) => (
-                  <option key={ct} value={ct}>
-                    {CLASS_TYPE_LABELS[ct]}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">
-                Mode <span className="text-orange-400">*</span>
-              </label>
-              <select
-                value={svc.mode}
-                onChange={(e) => onUpdate(idx, 'mode', e.target.value)}
-                className={selectClass}
-              >
-                <option value="ONE_TO_ONE">One-to-one</option>
-                <option value="GROUP">Group</option>
-              </select>
+                options={CLASS_TYPES.map((classType) => ({
+                  value: classType,
+                  label: CLASS_TYPE_LABELS[classType],
+                }))}
+                ariaLabel="Class type"
+              />
             </div>
 
             <div>
@@ -103,21 +89,9 @@ export function CoachSettingsServicesSection({
               />
             </div>
 
-            <div className="flex gap-2 items-end">
-              <div className="flex-1">
-                <label className="block text-xs text-gray-400 mb-1">
-                  {svc.mode === 'GROUP' ? 'Max students' : 'Students'}
-                </label>
-                <input
-                  type="number"
-                  min={svc.mode === 'GROUP' ? 2 : 1}
-                  max={svc.mode === 'ONE_TO_ONE' ? 1 : undefined}
-                  required
-                  value={svc.mode === 'ONE_TO_ONE' ? '1' : svc.maxStudents}
-                  disabled={svc.mode === 'ONE_TO_ONE'}
-                  onChange={(e) => onUpdate(idx, 'maxStudents', e.target.value)}
-                  className={`${selectClass} disabled:opacity-50`}
-                />
+            <div className="flex gap-2 items-end sm:justify-end">
+              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2.5 text-sm font-semibold text-emerald-200">
+                1:1 lesson
               </div>
               {services.length > 1 && (
                 <button

@@ -56,12 +56,14 @@ export function AuthLayout({
 
         {children}
 
-        {footer ?? (
+        {footer === undefined ? (
           <p className="mt-8 text-center text-sm text-slate-500">
             <Link to={ROUTES.HOME} className="transition-colors hover:text-slate-800 dark:hover:text-slate-300">
               Back to home
             </Link>
           </p>
+        ) : (
+          footer
         )}
       </div>
     </div>

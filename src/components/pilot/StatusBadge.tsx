@@ -1,9 +1,4 @@
 const STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
-  PENDING_PAYMENT: {
-    bg: 'bg-amber-500/15 border-amber-500/40',
-    text: 'text-amber-300',
-    label: 'Pending payment',
-  },
   CONFIRMED: {
     bg: 'bg-emerald-500/15 border-emerald-500/40',
     text: 'text-emerald-300',
@@ -14,10 +9,10 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }>
     text: 'text-red-300',
     label: 'Cancelled',
   },
-  COMPLETED: {
-    bg: 'bg-blue-500/15 border-blue-500/40',
-    text: 'text-blue-300',
-    label: 'Completed',
+  PAST: {
+    bg: 'bg-slate-500/15 border-slate-500/40',
+    text: 'text-slate-300',
+    label: 'Past',
   },
 };
 

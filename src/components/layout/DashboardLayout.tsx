@@ -7,9 +7,9 @@ import { Navbar } from './Navbar';
  */
 export function DashboardLayout() {
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.12),transparent_34%),linear-gradient(180deg,#fff7ed_0%,#f8fafc_32%,#eef2f7_100%)] text-slate-950 transition-colors duration-300 dark:bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.16),transparent_32%),linear-gradient(180deg,#0f172a_0%,#111827_45%,#020617_100%)] dark:text-slate-100">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.16),transparent_30%),radial-gradient(circle_at_90%_12%,rgba(14,165,233,0.12),transparent_24%),linear-gradient(180deg,#fff7ed_0%,#f8fafc_30%,#eef2f7_100%)] text-slate-950 transition-colors duration-300 dark:bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.18),transparent_30%),radial-gradient(circle_at_90%_12%,rgba(16,185,129,0.11),transparent_24%),linear-gradient(180deg,#0f172a_0%,#111827_45%,#020617_100%)] dark:text-slate-100">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <Outlet />
       </main>
     </div>

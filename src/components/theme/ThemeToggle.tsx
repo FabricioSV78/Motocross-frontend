@@ -1,5 +1,6 @@
 import { useThemeMode } from 'flowbite-react/hooks/use-theme-mode';
 import { clsx } from 'clsx';
+import { FlowbiteIcon } from '@/components/ui/FlowbiteIcon';
 
 interface ThemeToggleProps {
   compact?: boolean;
@@ -33,16 +34,7 @@ export function ThemeToggle({ compact = false, className }: ThemeToggleProps) {
           isDark ? 'bg-slate-800 text-orange-300' : 'bg-orange-100 text-orange-600'
         )}
       >
-        {isDark ? (
-          <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M10 2a.75.75 0 0 1 .75.75v1a.75.75 0 0 1-1.5 0v-1A.75.75 0 0 1 10 2ZM10 15.5a.75.75 0 0 1 .75.75v1a.75.75 0 0 1-1.5 0v-1a.75.75 0 0 1 .75-.75ZM18 10a.75.75 0 0 1-.75.75h-1a.75.75 0 0 1 0-1.5h1A.75.75 0 0 1 18 10ZM4.5 10a.75.75 0 0 1-.75.75h-1a.75.75 0 0 1 0-1.5h1A.75.75 0 0 1 4.5 10ZM15.657 4.343a.75.75 0 0 1 0 1.06l-.707.708a.75.75 0 0 1-1.061-1.06l.707-.708a.75.75 0 0 1 1.06 0ZM6.111 13.889a.75.75 0 0 1 0 1.06l-.707.708a.75.75 0 0 1-1.061-1.06l.707-.708a.75.75 0 0 1 1.061 0ZM15.657 15.657a.75.75 0 0 1-1.06 0l-.708-.707a.75.75 0 0 1 1.06-1.061l.708.707a.75.75 0 0 1 0 1.06ZM6.111 6.111a.75.75 0 0 1-1.06 0l-.708-.707a.75.75 0 0 1 1.06-1.061l.708.707a.75.75 0 0 1 0 1.061Z" />
-            <path d="M10 6.25a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5Z" />
-          </svg>
-        ) : (
-          <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M17.293 13.293A8 8 0 0 1 6.707 2.707 8.001 8.001 0 1 0 17.293 13.293Z" />
-          </svg>
-        )}
+        <FlowbiteIcon name={isDark ? 'sun' : 'moon'} className="h-3.5 w-3.5" />
       </span>
       {!compact && (
         <span>

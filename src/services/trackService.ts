@@ -90,6 +90,9 @@ export interface CoachForTrack {
   name: string;
   status: string;
   services: CoachServiceForTrack[];
+  foto?: string | null;
+  bio?: string | null;
+  experience?: string | null;
 }
 
 export interface TrackDetailPublic {
@@ -177,6 +180,10 @@ export interface AvailableSlot {
   capacity: number;
   rentalType: string;
   pilotCategory: string;
+  reserved?: number;
+  remaining?: number;
+  isFull?: boolean;
+  occupancyPercent?: number;
 }
 
 /** Sube una foto de pista desde el dispositivo (empresa aprobada). */
@@ -247,8 +254,8 @@ export interface TrackAvailabilityItem {
   startTime: string;
   endTime: string;
   capacity: number;
-  rentalType: string;
-  pilotCategory: string;
+  rentalType: RentalType;
+  pilotCategory: PilotCategory;
 }
 
 /** HU-12: Crear disponibilidad de una pista. Requiere rol COMPANY. */

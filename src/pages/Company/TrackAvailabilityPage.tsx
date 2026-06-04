@@ -19,10 +19,10 @@ import type {
   TrackAvailabilityItem,
   TrackDetail,
 } from '@/services/trackService';
-import { Button } from '@/components/ui/Button';
+import { Button, DatePickerField, DateRangePickerField } from '@/components/ui';
 import { ROUTES } from '@/router/routes';
 import { TrackAvailabilityCalendar } from './TrackAvailabilityCalendar';
-import { TODAY, WEEKDAYS, generateDates } from './trackAvailabilityUtils';
+import { TODAY, generateDates } from './trackAvailabilityUtils';
 
 const RENTAL_TYPE_OPTIONS: Array<{
   value: RentalType;
@@ -89,7 +89,6 @@ export function TrackAvailabilityPage() {
   const [date, setDate] = useState(TODAY);
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-  const [weekdays, setWeekdays] = useState<number[]>([1, 2, 3, 4, 5]);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [capacity, setCapacity] = useState('');
@@ -101,8 +100,8 @@ export function TrackAvailabilityPage() {
   const [reviewConfirmed, setReviewConfirmed] = useState(false);
 
   const previewDates = useMemo(
-    () => (mode === 'weekly' ? generateDates(fromDate, toDate, weekdays) : []),
-    [fromDate, mode, toDate, weekdays]
+    () => (mode === 'weekly' ? generateDates(fromDate, toDate) : []),
+    [fromDate, mode, toDate]
   );
 
   const parsedCapacity = Number.parseInt(capacity, 10);
@@ -155,9 +154,10 @@ export function TrackAvailabilityPage() {
         if (!active) return;
         setLoadError('We could not load this track calendar.');
       } finally {
-        if (!active) return;
-        setLoadingPage(false);
-        setLoadingSlots(false);
+        if (active) {
+          setLoadingPage(false);
+          setLoadingSlots(false);
+        }
       }
     }
 
@@ -219,12 +219,6 @@ export function TrackAvailabilityPage() {
     if (mode === 'single') {
       setDate(nextDate);
     }
-  }
-
-  function toggleWeekday(day: number) {
-    setWeekdays((current) =>
-      current.includes(day) ? current.filter((value) => value !== day) : [...current, day]
-    );
   }
 
   function applyTimePreset(start: string, end: string, presetRentalType: RentalType) {
@@ -363,7 +357,7 @@ export function TrackAvailabilityPage() {
     }
 
     if (previewDates.length === 0) {
-      return 'Choose a date range and weekdays to preview the schedule.';
+      return 'Choose a date range to preview the schedule.';
     }
 
     return `${previewDates.length} days - ${startTime || '--:--'} to ${endTime || '--:--'} - ${durationLabel} - ${capacity || '--'} riders - ${riderLabel}`;
@@ -447,7 +441,6 @@ export function TrackAvailabilityPage() {
           fromDate={fromDate}
           hasValidDateSelection={hasValidDateSelection}
           hasValidTimeRange={hasValidTimeRange}
-          isCapacityValid={isCapacityValid}
           isSubmitDisabled={isSubmitDisabled}
           mode={mode}
           pilotCategory={pilotCategory}
@@ -462,7 +455,6 @@ export function TrackAvailabilityPage() {
           success={success}
           toDate={toDate}
           trackCapacity={track?.capacity}
-          weekdays={weekdays}
           onApplyPreset={applyTimePreset}
           onClose={closeRegisterModal}
           onContinue={handleContinue}
@@ -496,7 +488,6 @@ export function TrackAvailabilityPage() {
           }}
           onSubmit={handleSubmit}
           onToDateChange={setToDate}
-          onToggleWeekday={toggleWeekday}
         />
       ) : null}
     </div>
@@ -514,7 +505,6 @@ function RegisterAvailabilityModal({
   fromDate,
   hasValidDateSelection,
   hasValidTimeRange,
-  isCapacityValid,
   isSubmitDisabled,
   mode,
   pilotCategory,
@@ -529,7 +519,6 @@ function RegisterAvailabilityModal({
   success,
   toDate,
   trackCapacity,
-  weekdays,
   onApplyPreset,
   onClose,
   onContinue,
@@ -545,7 +534,6 @@ function RegisterAvailabilityModal({
   onSetStartTime,
   onSubmit,
   onToDateChange,
-  onToggleWeekday,
 }: {
   activeStep: WizardStep;
   canOpenStepTwo: boolean;
@@ -557,7 +545,6 @@ function RegisterAvailabilityModal({
   fromDate: string;
   hasValidDateSelection: boolean;
   hasValidTimeRange: boolean;
-  isCapacityValid: boolean;
   isSubmitDisabled: boolean;
   mode: Mode;
   pilotCategory: PilotCategory;
@@ -572,7 +559,6 @@ function RegisterAvailabilityModal({
   success: string | null;
   toDate: string;
   trackCapacity?: number;
-  weekdays: number[];
   onApplyPreset: (start: string, end: string, rentalType: RentalType) => void;
   onClose: () => void;
   onContinue: () => void;
@@ -588,7 +574,6 @@ function RegisterAvailabilityModal({
   onSetStartTime: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onToDateChange: (value: string) => void;
-  onToggleWeekday: (day: number) => void;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 px-4 py-4 backdrop-blur-sm">
@@ -678,63 +663,27 @@ function RegisterAvailabilityModal({
                 </div>
 
                 {mode === 'single' ? (
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">
-                    Date
-                    <input
-                      type="date"
-                      min={TODAY}
-                      value={date}
-                      onChange={(event) => onFieldDateChange(event.target.value)}
-                      className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-slate-950 shadow-sm focus:border-orange-500 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-                    />
-                  </label>
+                  <DatePickerField
+                    label="Date"
+                    required
+                    value={date}
+                    onChange={onFieldDateChange}
+                    minDateKey={TODAY}
+                  />
                 ) : (
                   <div className="space-y-4">
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">
-                        From
-                        <input
-                          type="date"
-                          min={TODAY}
-                          value={fromDate}
-                          onChange={(event) => onFromDateChange(event.target.value)}
-                          className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-slate-950 shadow-sm focus:border-orange-500 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-                        />
-                      </label>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">
-                        To
-                        <input
-                          type="date"
-                          min={fromDate || TODAY}
-                          value={toDate}
-                          onChange={(event) => onToDateChange(event.target.value)}
-                          className="mt-2 h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-slate-950 shadow-sm focus:border-orange-500 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-                        />
-                      </label>
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Days</p>
-                      <div className="mt-2 grid grid-cols-7 gap-2">
-                        {WEEKDAYS.map((day) => {
-                          const selected = weekdays.includes(day.value);
-                          return (
-                            <button
-                              key={day.value}
-                              type="button"
-                              onClick={() => onToggleWeekday(day.value)}
-                              className={`h-10 rounded-md text-sm font-semibold transition ${
-                                selected
-                                  ? 'bg-orange-500 text-white shadow-sm'
-                                  : 'border border-slate-200 bg-white text-slate-500 hover:text-slate-950 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:text-white'
-                              }`}
-                            >
-                              {day.label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
+                    <DateRangePickerField
+                      label="Date range"
+                      required
+                      fromValue={fromDate}
+                      toValue={toDate}
+                      minDateKey={TODAY}
+                      onChange={(nextFromDate, nextToDate) => {
+                        onFromDateChange(nextFromDate);
+                        onToDateChange(nextToDate);
+                      }}
+                      hint="Select the first day, then the last day. The range will be highlighted."
+                    />
 
                     <div className="rounded-xl border border-orange-200 bg-orange-50 p-3 dark:border-orange-500/20 dark:bg-orange-500/10">
                       <p className="text-sm font-semibold text-slate-950 dark:text-white">
@@ -748,7 +697,7 @@ function RegisterAvailabilityModal({
                               .slice(0, 5)
                               .map((value) => format(parseISO(`${value}T00:00:00`), 'EEE, MMM d'))
                               .join(' / ')
-                          : 'Choose a range and at least one day.'}
+                          : 'Choose a start and end date.'}
                       </p>
                     </div>
                   </div>
@@ -1023,7 +972,7 @@ function SelectedDayPanel({
         <div className="mt-3 grid grid-cols-3 gap-2">
           <MiniStat label="Slots" value={String(slots.length)} />
           <MiniStat label="Windows" value={String(rentalTypes)} />
-          <MiniStat label="Groups" value={String(categories)} />
+          <MiniStat label="Categories" value={String(categories)} />
         </div>
         {firstSlot ? (
           <div className="mt-3 rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 dark:border-orange-500/25 dark:bg-orange-500/10">
@@ -1060,7 +1009,7 @@ function SelectedDayPanel({
                   {formatRentalType(slot.rentalType)}
                 </span>
               </div>
-              <p className="mt-2 text-xs text-slate-500 dark:text-slate-300">Capacity {slot.maxRiders}</p>
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-300">Capacity {slot.capacity}</p>
             </article>
           ))
         )}

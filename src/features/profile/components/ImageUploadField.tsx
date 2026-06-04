@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ImageUploadFieldProps {
   label: string;
@@ -7,24 +7,21 @@ interface ImageUploadFieldProps {
   accept?: string;
   disabled?: boolean;
   placeholder?: string;
+  heightClassName?: string;
 }
 
-/**
- * Campo de upload de imagen con preview
- * Permite seleccionar un archivo de imagen y muestra un preview inmediato
- */
 export function ImageUploadField({
   label,
   currentUrl,
   onFileSelect,
   accept = 'image/jpeg,image/png,image/webp',
   disabled = false,
-  placeholder = '📷',
+  placeholder = 'Photo',
+  heightClassName = 'h-48',
 }: ImageUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(currentUrl);
 
-  // Sync preview when the external URL changes (e.g. after a save)
   useEffect(() => {
     setPreview(currentUrl);
   }, [currentUrl]);
@@ -35,56 +32,55 @@ export function ImageUploadField({
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
-    // Show local preview immediately
     const objectUrl = URL.createObjectURL(file);
     setPreview(objectUrl);
     onFileSelect(file);
-
-    // Reset input so the same file can be re-selected if needed
-    e.target.value = '';
+    event.target.value = '';
   };
 
   return (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-300">{label}</label>
+    <div className="space-y-2.5">
+      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>
 
       <div
         role="button"
         tabIndex={disabled ? -1 : 0}
-        aria-label={`Seleccionar ${label}`}
-        className={`
-          relative w-full h-48 rounded-xl overflow-hidden border-2 border-dashed
-          transition-colors duration-200 cursor-pointer group
-          ${disabled
-            ? 'border-gray-700 cursor-not-allowed opacity-60'
-            : 'border-gray-600 hover:border-orange-500'}
-        `}
+        aria-label={`Select ${label}`}
+        className={[
+          'group relative w-full overflow-hidden rounded-2xl border-2 border-dashed transition-colors duration-200',
+          heightClassName,
+          disabled
+            ? 'cursor-not-allowed border-slate-300 opacity-60 dark:border-slate-700'
+            : 'cursor-pointer border-slate-300 hover:border-orange-500 dark:border-slate-600',
+        ].join(' ')}
         onClick={handleClick}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleClick(); }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') handleClick();
+        }}
       >
         {preview ? (
           <>
-            <img
-              src={preview}
-              alt={label}
-              className="w-full h-full object-cover"
-            />
+            <img src={preview} alt={label} className="h-full w-full object-cover" />
             {!disabled && (
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
-                <span className="text-white text-2xl">📷</span>
-                <span className="text-white text-sm font-medium">Cambiar foto</span>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-slate-950/55 opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white">
+                  Update photo
+                </span>
+                <span className="text-sm font-medium text-white">Click to replace</span>
               </div>
             )}
           </>
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-gray-500 group-hover:text-orange-400 transition-colors bg-gray-900/50">
-            <span className="text-5xl">{placeholder}</span>
-            <span className="text-sm font-medium">Click para subir foto</span>
-            <span className="text-xs text-gray-600">JPG, PNG o WebP · máx. 5 MB</span>
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-slate-100 text-slate-500 transition-colors group-hover:text-orange-500 dark:bg-slate-900/50 dark:text-slate-400">
+            <span className="rounded-full border border-slate-300 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+              {placeholder}
+            </span>
+            <span className="text-sm font-medium">Click to upload a photo</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500">JPG, PNG, or WebP · Max 5 MB</span>
           </div>
         )}
       </div>

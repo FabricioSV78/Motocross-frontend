@@ -48,6 +48,7 @@ export function LoginPage() {
       const userInfo = {
         id: response.user.id.toString(),
         email: response.user.email,
+        name: response.user.nombre,
         role: response.role,
       };
       setStoredAuthUser(userInfo);

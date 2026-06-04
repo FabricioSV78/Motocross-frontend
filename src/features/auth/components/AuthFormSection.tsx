@@ -10,10 +10,14 @@ export function AuthFormSection({ title, description, children }: AuthFormSectio
   return (
     <fieldset className="space-y-4">
       <legend className="w-full">
-        <span className="text-xs font-semibold uppercase tracking-widest text-gray-500">
+        <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
           {title}
         </span>
-        {description && <p className="text-xs text-gray-500 mt-1 normal-case tracking-normal">{description}</p>}
+        {description && (
+          <p className="mt-1 text-xs normal-case tracking-normal text-slate-500 dark:text-slate-400">
+            {description}
+          </p>
+        )}
       </legend>
       {children}
     </fieldset>

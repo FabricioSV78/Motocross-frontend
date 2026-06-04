@@ -16,10 +16,10 @@ import {
   type AvailableSlot,
 } from '@/services/trackService';
 import { LoadingSpinner } from '@/components/common';
-import { Button } from '@/components/ui/Button';
+import { Button, DatePickerField, DateRangePickerField, SelectField } from '@/components/ui';
 import { ROUTES } from '@/router/routes';
 import { CoachAvailabilityCalendar } from './CoachAvailabilityCalendar';
-import { WEEKDAYS, TODAY, generateDates } from './coachAvailabilityUtils';
+import { TODAY, generateDates } from './coachAvailabilityUtils';
 
 type Mode = 'single' | 'weekly';
 type WizardStep = 1 | 2 | 3;
@@ -32,7 +32,6 @@ interface AvailabilityFormState {
   date: string;
   fromDate: string;
   toDate: string;
-  weekdays: number[];
   startTime: string;
   endTime: string;
 }
@@ -44,10 +43,11 @@ const EMPTY_FORM: AvailabilityFormState = {
   date: TODAY,
   fromDate: '',
   toDate: '',
-  weekdays: [1, 2, 3, 4, 5],
   startTime: '',
   endTime: '',
 };
+
+const COACH_CLASS_MODE: ClassMode = 'ONE_TO_ONE';
 
 export function CoachAvailabilityPage() {
   const [coachTracks, setCoachTracks] = useState<TrackRefResponse[]>([]);
@@ -69,7 +69,7 @@ export function CoachAvailabilityPage() {
 
   const selectedService = coachServices.find((service) => String(service.id) === form.selectedServiceId);
   const previewDates = form.mode === 'weekly'
-    ? generateDates(form.fromDate, form.toDate, form.weekdays)
+    ? generateDates(form.fromDate, form.toDate)
     : [];
   const selectedDaySlots = useMemo(
     () =>
@@ -113,14 +113,16 @@ export function CoachAvailabilityPage() {
   const loadData = () =>
     Promise.all([getCoachSettings(), getAvailability()])
       .then(([settings, availability]) => {
+        const oneToOneServices = settings.services.filter((service) => service.mode === 'ONE_TO_ONE');
+        const oneToOneAvailability = availability.filter((slot) => slot.mode === 'ONE_TO_ONE');
         setCoachTracks(settings.tracks);
-        setCoachServices(settings.services);
-        setSlots(availability);
+        setCoachServices(oneToOneServices);
+        setSlots(oneToOneAvailability);
         setForm((current) => ({
           ...current,
           trackId: current.trackId || (settings.tracks[0] ? String(settings.tracks[0].trackId) : ''),
           selectedServiceId:
-            current.selectedServiceId || (settings.services[0] ? String(settings.services[0].id) : ''),
+            current.selectedServiceId || (oneToOneServices[0] ? String(oneToOneServices[0].id) : ''),
         }));
       })
       .catch(() => setError('Availability could not be loaded.'))
@@ -156,7 +158,7 @@ export function CoachAvailabilityPage() {
   }, [form.mode, form.trackId, form.date]);
 
   useEffect(() => {
-    const dates = generateDates(form.fromDate, form.toDate, form.weekdays);
+    const dates = generateDates(form.fromDate, form.toDate);
     if (form.mode !== 'weekly' || !form.trackId || dates.length === 0) {
       setWeeklyTrackSlots({});
       setWeeklyTrackSlotsLoading(false);
@@ -183,7 +185,7 @@ export function CoachAvailabilityPage() {
     return () => {
       active = false;
     };
-  }, [form.mode, form.trackId, form.fromDate, form.toDate, form.weekdays]);
+  }, [form.mode, form.trackId, form.fromDate, form.toDate]);
 
   function setField<K extends keyof AvailabilityFormState>(key: K, value: AvailabilityFormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -210,16 +212,6 @@ export function CoachAvailabilityPage() {
     if (saving) return;
     setIsModalOpen(false);
     setError(null);
-    setReviewConfirmed(false);
-  }
-
-  function toggleWeekday(value: number) {
-    setForm((current) => ({
-      ...current,
-      weekdays: current.weekdays.includes(value)
-        ? current.weekdays.filter((day) => day !== value)
-        : [...current.weekdays, value],
-    }));
     setReviewConfirmed(false);
   }
 
@@ -295,7 +287,7 @@ export function CoachAvailabilityPage() {
           startTime: form.startTime,
           endTime: form.endTime,
           classType: selectedService.classType as ClassType,
-          mode: selectedService.mode as ClassMode,
+          mode: COACH_CLASS_MODE,
         });
         setSuccess(response.message);
         setSelectedDate(form.date);
@@ -311,7 +303,7 @@ export function CoachAvailabilityPage() {
           startTime: form.startTime,
           endTime: form.endTime,
           classType: selectedService.classType as ClassType,
-          mode: selectedService.mode as ClassMode,
+          mode: COACH_CLASS_MODE,
         });
         setSuccess(response.message);
       }
@@ -321,7 +313,6 @@ export function CoachAvailabilityPage() {
         date: form.mode === 'single' ? TODAY : current.date,
         fromDate: '',
         toDate: '',
-        weekdays: [1, 2, 3, 4, 5],
         startTime: '',
         endTime: '',
       }));
@@ -424,7 +415,6 @@ export function CoachAvailabilityPage() {
           onGoToStep={goToStep}
           onReviewConfirmedChange={setReviewConfirmed}
           onSubmit={handleSubmit}
-          onToggleWeekday={toggleWeekday}
           onUseTrackSlot={useTrackSlot}
           canPublish={canPublish}
         />
@@ -457,7 +447,6 @@ function AvailabilityWizardModal({
   onGoToStep,
   onReviewConfirmedChange,
   onSubmit,
-  onToggleWeekday,
   onUseTrackSlot,
   canPublish,
 }: {
@@ -484,7 +473,6 @@ function AvailabilityWizardModal({
   onGoToStep: (step: WizardStep) => void;
   onReviewConfirmedChange: (value: boolean) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  onToggleWeekday: (value: number) => void;
   onUseTrackSlot: (slot: AvailableSlot) => void;
   canPublish: boolean;
 }) {
@@ -492,7 +480,7 @@ function AvailabilityWizardModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 px-4 py-4 backdrop-blur-sm">
       <form
         onSubmit={onSubmit}
-        className="flex h-[min(740px,calc(100vh-32px))] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-950 shadow-2xl shadow-slate-950/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+        className="flex h-[min(720px,calc(100vh-32px))] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-950 shadow-2xl shadow-slate-950/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
       >
         <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 dark:border-slate-700">
           <div>
@@ -557,32 +545,32 @@ function AvailabilityWizardModal({
               <StepPanel title="Choose track, service, and date">
                 <div className="grid gap-4 lg:grid-cols-2">
                   <Field label="Track" required>
-                    <select
+                    <SelectField
                       value={form.trackId}
-                      onChange={(event) => onFieldChange('trackId', event.target.value)}
+                      onChange={(value) => onFieldChange('trackId', value)}
                       className={inputClass}
-                    >
-                      {coachTracks.map((track) => (
-                        <option key={track.trackId} value={String(track.trackId)}>
-                          {track.trackName}
-                        </option>
-                      ))}
-                    </select>
+                      options={coachTracks.map((track) => ({
+                        value: String(track.trackId),
+                        label: track.trackName,
+                      }))}
+                      ariaLabel="Track"
+                    />
                   </Field>
 
                   <Field label="Service" required>
-                    <select
+                    <SelectField
                       value={form.selectedServiceId}
-                      onChange={(event) => onFieldChange('selectedServiceId', event.target.value)}
+                      onChange={(value) => onFieldChange('selectedServiceId', value)}
                       className={inputClass}
-                    >
-                      <option value="">Select a service</option>
-                      {coachServices.map((service) => (
-                        <option key={service.id} value={String(service.id)}>
-                          {formatServiceLabel(service)}
-                        </option>
-                      ))}
-                    </select>
+                      options={[
+                        { value: '', label: 'Select a service' },
+                        ...coachServices.map((service) => ({
+                          value: String(service.id),
+                          label: formatServiceLabel(service),
+                        })),
+                      ]}
+                      ariaLabel="Service"
+                    />
                   </Field>
                 </div>
 
@@ -606,57 +594,30 @@ function AvailabilityWizardModal({
                 </div>
 
                 {form.mode === 'single' ? (
-                  <Field label="Date" required>
-                    <input
-                      type="date"
-                      min={TODAY}
-                      value={form.date}
-                      onChange={(event) => onFieldChange('date', event.target.value)}
-                      className={inputClass}
-                    />
-                  </Field>
+                  <DatePickerField
+                    label="Date"
+                    required
+                    value={form.date}
+                    onChange={(value) => onFieldChange('date', value)}
+                    minDateKey={TODAY}
+                    accent="emerald"
+                  />
                 ) : (
                   <div className="space-y-4">
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <Field label="From" required>
-                        <input
-                          type="date"
-                          min={TODAY}
-                          value={form.fromDate}
-                          onChange={(event) => onFieldChange('fromDate', event.target.value)}
-                          className={inputClass}
-                        />
-                      </Field>
-                      <Field label="To" required>
-                        <input
-                          type="date"
-                          min={form.fromDate || TODAY}
-                          value={form.toDate}
-                          onChange={(event) => onFieldChange('toDate', event.target.value)}
-                          className={inputClass}
-                        />
-                      </Field>
-                    </div>
+                    <DateRangePickerField
+                      label="Date range"
+                      required
+                      fromValue={form.fromDate}
+                      toValue={form.toDate}
+                      minDateKey={TODAY}
+                      accent="emerald"
+                      onChange={(nextFromDate, nextToDate) => {
+                        onFieldChange('fromDate', nextFromDate);
+                        onFieldChange('toDate', nextToDate);
+                      }}
+                      hint="Select the first day, then the last day. The range will be highlighted."
+                    />
 
-                    <div>
-                      <p className="mb-2 text-sm font-medium text-slate-700 dark:text-slate-200">Weekdays</p>
-                      <div className="grid grid-cols-7 gap-2">
-                        {WEEKDAYS.map((day) => (
-                          <button
-                            key={day.value}
-                            type="button"
-                            onClick={() => onToggleWeekday(day.value)}
-                            className={`h-10 rounded-md text-sm font-semibold transition ${
-                              form.weekdays.includes(day.value)
-                                ? 'bg-orange-500 text-white shadow-sm'
-                                : 'border border-slate-200 bg-white text-slate-500 hover:text-slate-950 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:text-white'
-                            }`}
-                          >
-                            {day.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 )}
               </StepPanel>
@@ -1065,7 +1026,7 @@ function SelectedDayPanel({
                   {formatServiceType(slot.classType)}
                 </span>
               </div>
-              <p className="mt-2 text-xs text-slate-500 dark:text-slate-300">{formatMode(slot)}</p>
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-300">1:1</p>
             </article>
           ))
         )}
@@ -1215,21 +1176,13 @@ function serviceFitsTrackSlot(service: ServiceItemResponse | undefined, slot: Av
 }
 
 function formatServiceLabel(service: ServiceItemResponse) {
-  return `${formatServiceType(service.classType)} / ${formatServiceMode(service)} / $${service.price}`;
+  return `${formatServiceType(service.classType)} / 1:1 / $${service.price}`;
 }
 
 function formatServiceType(classType: string) {
   if (classType === 'HOURLY') return 'Hourly';
   if (classType === 'HALF_DAY') return 'Half day';
   return 'Full day';
-}
-
-function formatServiceMode(service: ServiceItemResponse) {
-  return service.mode === 'ONE_TO_ONE' ? '1:1' : `Group max ${service.maxStudents}`;
-}
-
-function formatMode(slot: AvailabilityItem) {
-  return slot.mode === 'ONE_TO_ONE' ? '1:1' : `Group max ${slot.maxStudents}`;
 }
 
 function formatTrackSlotType(rentalType: string) {

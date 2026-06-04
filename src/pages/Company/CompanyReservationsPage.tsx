@@ -3,9 +3,10 @@ import { Link, useParams } from 'react-router-dom';
 import { reservationService } from '@/services/reservationService';
 import { getTrackById } from '@/services/trackService';
 import { formatDate, formatTime } from '@/utils/date';
-import { getReservationFields, type ReservationRow } from '@/utils/reservationFields';
+import { getReservationFields, sortReservationsBySchedule, type ReservationRow } from '@/utils/reservationFields';
 import { ROUTES } from '@/router/routes';
 import { Button } from '@/components/ui/Button';
+import { PaginationControls } from '@/components/common/PaginationControls';
 import {
   PageHeader,
   StatusBadge,
@@ -13,14 +14,16 @@ import {
   ReservationCardSkeleton,
 } from '@/components/pilot';
 
-type FilterKey = 'all' | 'CONFIRMED' | 'PENDING_PAYMENT' | 'CANCELLED';
+type FilterKey = 'all' | 'CONFIRMED' | 'CANCELLED' | 'PAST';
 
 const FILTERS: { value: FilterKey; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'CONFIRMED', label: 'Confirmed' },
-  { value: 'PENDING_PAYMENT', label: 'Pending' },
   { value: 'CANCELLED', label: 'Cancelled' },
+  { value: 'PAST', label: 'Past' },
 ];
+
+const CARDS_PER_PAGE = 10;
 
 export function CompanyReservationsPage() {
   const { trackId } = useParams<{ trackId: string }>();
@@ -30,6 +33,7 @@ export function CompanyReservationsPage() {
   const [trackName, setTrackName] = useState('');
   const [filter, setFilter] = useState<FilterKey>('all');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
 
   const loadReservations = useCallback(async () => {
     if (!trackId) return;
@@ -65,20 +69,11 @@ export function CompanyReservationsPage() {
     () => ({
       all: reservations.length,
       CONFIRMED: reservations.filter((r) => r.status === 'CONFIRMED').length,
-      PENDING_PAYMENT: reservations.filter((r) => r.status === 'PENDING_PAYMENT').length,
       CANCELLED: reservations.filter((r) => r.status === 'CANCELLED').length,
+      PAST: reservations.filter((r) => r.status === 'PAST').length,
     }),
     [reservations]
   );
-
-  const upcomingCount = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return reservations.filter((r) => {
-      const date = new Date(`${r.reservationDate}T12:00:00`);
-      return date >= today && r.status !== 'CANCELLED';
-    }).length;
-  }, [reservations]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -92,6 +87,21 @@ export function CompanyReservationsPage() {
       return matchesFilter && matchesSearch;
     });
   }, [reservations, filter, search]);
+
+  const ordered = useMemo(() => sortReservationsBySchedule(filtered), [filtered]);
+  const pageCount = Math.max(1, Math.ceil(ordered.length / CARDS_PER_PAGE));
+  const currentPageItems = useMemo(
+    () => ordered.slice((page - 1) * CARDS_PER_PAGE, page * CARDS_PER_PAGE),
+    [ordered, page]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [filter, search, reservations]);
+
+  useEffect(() => {
+    if (page > pageCount) setPage(pageCount);
+  }, [page, pageCount]);
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -116,9 +126,9 @@ export function CompanyReservationsPage() {
         <div className="mb-6 space-y-4">
           <div className="grid gap-3 sm:grid-cols-4">
             <StatCard label="Total" value={counts.all} />
-            <StatCard label="Upcoming" value={upcomingCount} />
             <StatCard label="Confirmed" value={counts.CONFIRMED} />
-            <StatCard label="Pending" value={counts.PENDING_PAYMENT} />
+            <StatCard label="Past" value={counts.PAST} />
+            <StatCard label="Cancelled" value={counts.CANCELLED} />
           </div>
 
           <div className="flex flex-col gap-3">
@@ -184,10 +194,20 @@ export function CompanyReservationsPage() {
 
       {!loading && filtered.length > 0 && (
         <div className="space-y-3">
-          {filtered.map((booking) => (
+          {currentPageItems.map((booking) => (
             <BookingCard key={booking.id} booking={booking} />
           ))}
         </div>
+      )}
+
+      {!loading && filtered.length > 0 && (
+        <PaginationControls
+          page={page}
+          pageCount={pageCount}
+          pageSize={CARDS_PER_PAGE}
+          totalItems={ordered.length}
+          onPageChange={setPage}
+        />
       )}
     </div>
   );
@@ -272,7 +292,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
 function formatService(booking: ReservationRow) {
   if (!booking.classType) return 'Track only';
   const type = formatValue(booking.classType);
-  const mode = booking.classMode ? ` - ${formatValue(booking.classMode)}` : '';
+  const mode = booking.classMode === 'ONE_TO_ONE' ? ' - 1:1' : '';
   return `${type}${mode}`;
 }
 

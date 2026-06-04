@@ -45,18 +45,18 @@ export const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
-    <main className="min-h-screen bg-white text-slate-950 transition-colors duration-300 dark:bg-black dark:text-neutral-100">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.14),transparent_32%),linear-gradient(180deg,#fff7ed_0%,#f8fafc_34%,#eef2f7_100%)] text-slate-950 transition-colors duration-300 dark:bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.16),transparent_32%),linear-gradient(180deg,#020617_0%,#111827_42%,#020617_100%)] dark:text-neutral-100">
       <Hero onNavigate={navigate} />
 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="mb-10 max-w-2xl">
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-orange-400">
+          <p className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-orange-600 dark:text-orange-300">
             How it works
           </p>
-          <h2 className="text-3xl font-black tracking-tight text-white sm:text-5xl">
+          <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white sm:text-5xl">
             From "where can I ride?" to "booking confirmed."
           </h2>
-          <p className="mt-4 text-base leading-7 text-neutral-400">
+          <p className="mt-4 text-base leading-7 text-slate-600 dark:text-neutral-400">
             Motocross App connects riders, coaches, and track owners around one simple truth:
             a session only works when the track, the coach, and the rider are available at the same time.
           </p>
@@ -66,28 +66,28 @@ export const LandingPage = () => {
           {riderSteps.map((step, index) => (
             <article
               key={step.title}
-              className="rounded-lg border border-white/10 bg-neutral-950 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.35)]"
+              className="rounded-2xl border border-slate-200/80 bg-white/88 p-6 shadow-xl shadow-slate-200/60 backdrop-blur dark:border-white/10 dark:bg-neutral-950/85 dark:shadow-black/35"
             >
               <span className="mb-6 flex h-10 w-10 items-center justify-center rounded-full bg-orange-600 text-sm font-black text-white shadow-[0_0_28px_rgba(234,88,12,0.28)]">
                 {index + 1}
               </span>
-              <h3 className="text-xl font-bold text-white">{step.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-neutral-400">{step.text}</p>
+              <h3 className="text-xl font-bold text-slate-950 dark:text-white">{step.title}</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-neutral-400">{step.text}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="border-y border-slate-200 bg-slate-50 text-slate-950 dark:border-white/10 dark:bg-neutral-950 dark:text-white">
+      <section className="border-y border-slate-200 bg-white/70 text-slate-950 backdrop-blur dark:border-white/10 dark:bg-neutral-950/70 dark:text-white">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-2xl">
-            <p className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-orange-300">
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-orange-600 dark:text-orange-300">
               Choose your lane
             </p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">
               One platform, three ways into the track.
             </h2>
-            <p className="mt-4 text-base leading-7 text-neutral-400">
+            <p className="mt-4 text-base leading-7 text-slate-600 dark:text-neutral-400">
               Whether you ride, coach, or operate a track, Motocross App gives you a direct path
               to the part of the sport you care about.
             </p>
@@ -97,19 +97,19 @@ export const LandingPage = () => {
             {audiences.map((item) => (
               <article
                 key={item.label}
-                className="group flex min-h-[300px] flex-col justify-between rounded-lg border border-white/10 bg-black p-6 text-white shadow-[0_24px_60px_rgba(0,0,0,0.35)] transition-colors hover:border-orange-500/80"
+                className="group flex min-h-[300px] flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 text-slate-950 shadow-xl shadow-slate-200/60 transition-all hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-orange-100 dark:border-white/10 dark:bg-black/80 dark:text-white dark:shadow-black/35 dark:hover:border-orange-500/80"
               >
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-orange-400">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-orange-600 dark:text-orange-400">
                     {item.label}
                   </p>
                   <h3 className="mt-4 text-3xl font-black tracking-tight">{item.title}</h3>
-                  <p className="mt-4 text-sm leading-6 text-neutral-400">{item.text}</p>
+                  <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-neutral-400">{item.text}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigate(item.route)}
-                  className="mt-8 w-fit rounded-lg border border-white/15 px-4 py-2 text-sm font-bold text-white transition-colors group-hover:border-orange-400 group-hover:text-orange-300"
+                  className="mt-8 w-fit rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 transition-colors group-hover:border-orange-400 group-hover:text-orange-600 dark:border-white/15 dark:text-white dark:group-hover:text-orange-300"
                 >
                   {item.action}
                 </button>
@@ -122,20 +122,20 @@ export const LandingPage = () => {
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
-            <p className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-orange-400">
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-orange-600 dark:text-orange-300">
               Why it feels different
             </p>
-            <h2 className="text-3xl font-black tracking-tight text-white sm:text-5xl">
+            <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white sm:text-5xl">
               Availability is visible before anyone commits.
             </h2>
-            <p className="mt-5 text-base leading-7 text-neutral-400">
+            <p className="mt-5 text-base leading-7 text-slate-600 dark:text-neutral-400">
               The platform treats track availability as the source of truth. Coaches publish lessons
               inside those windows, riders book compatible sessions, and companies see the resulting
               reservations immediately.
             </p>
           </div>
 
-          <div className="rounded-lg border border-white/10 bg-neutral-950 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
+          <div className="rounded-2xl border border-slate-200 bg-white/88 p-5 shadow-xl shadow-slate-200/60 backdrop-blur dark:border-white/10 dark:bg-neutral-950/85 dark:shadow-black/35">
             <div className="space-y-3">
               <TimelineItem title="Track opens availability" text="Capacity, date, time, and rider category are set." />
               <TimelineItem title="Coach adds matching lessons" text="Single-day and repeating schedules preview real track windows." />
@@ -146,7 +146,7 @@ export const LandingPage = () => {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-lg border border-white/10 bg-neutral-950 shadow-[0_28px_80px_rgba(0,0,0,0.45)]">
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/70 dark:border-white/10 dark:bg-neutral-950 dark:shadow-black/45">
           <div className="grid lg:grid-cols-[0.85fr_1.15fr]">
             <img
               src="/images/motocross.jpg"
@@ -154,13 +154,13 @@ export const LandingPage = () => {
               className="h-72 w-full object-cover lg:h-full"
             />
             <div className="p-7 sm:p-10">
-              <p className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-orange-400">
+              <p className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-orange-600 dark:text-orange-300">
                 Bring the ride online
               </p>
-              <h2 className="text-3xl font-black tracking-tight text-white sm:text-5xl">
+              <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white sm:text-5xl">
                 Less back-and-forth. More time on the dirt.
               </h2>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-neutral-400">
+              <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 dark:text-neutral-400">
                 The best sessions are the ones where nobody has to ask "is the track open?",
                 "is the coach free?", or "who is coming?". The app makes those answers visible.
               </p>
@@ -175,7 +175,7 @@ export const LandingPage = () => {
                 <button
                   type="button"
                   onClick={() => navigate(ROUTES.LOGIN)}
-                  className="rounded-lg border border-white/15 px-6 py-3 text-sm font-black text-white transition-colors hover:border-orange-400 hover:text-orange-300"
+                  className="rounded-lg border border-slate-200 px-6 py-3 text-sm font-black text-slate-700 transition-colors hover:border-orange-400 hover:text-orange-600 dark:border-white/15 dark:text-white dark:hover:text-orange-300"
                 >
                   I already have an account
                 </button>
@@ -185,9 +185,9 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      <footer className="border-t border-white/10 bg-black">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-neutral-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <p className="font-bold text-white">Motocross App</p>
+      <footer className="border-t border-slate-200 bg-white/80 backdrop-blur dark:border-white/10 dark:bg-black/80">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-slate-500 dark:text-neutral-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <p className="font-bold text-slate-950 dark:text-white">Motocross App</p>
           <p>Discover tracks, train with coaches, and manage bookings in one place.</p>
         </div>
       </footer>
@@ -272,9 +272,9 @@ function Hero({ onNavigate }: { onNavigate: (path: string) => void }) {
 
 function TimelineItem({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-neutral-950/70 p-4">
-      <h3 className="font-bold text-white">{title}</h3>
-      <p className="mt-1 text-sm leading-6 text-neutral-400">{text}</p>
+    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-neutral-950/70">
+      <h3 className="font-bold text-slate-950 dark:text-white">{title}</h3>
+      <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-neutral-400">{text}</p>
     </div>
   );
 }

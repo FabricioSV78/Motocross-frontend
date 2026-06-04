@@ -5,7 +5,6 @@ interface QuoteSummaryProps {
     track_price: number;
     coach_price?: number | null;
     subtotal: number;
-    tax: number;
     total: number;
     availability_available: boolean;
   };
@@ -15,24 +14,30 @@ interface QuoteSummaryProps {
 
 export function QuoteSummary({ quote, submitting, onConfirm }: QuoteSummaryProps) {
   return (
-    <div className="bg-gradient-to-br from-orange-500/10 to-transparent border border-orange-500/25 rounded-2xl p-6 mb-6">
-      <h2 className="text-lg font-bold text-white mb-4">Quote summary</h2>
+    <div className="quote-summary rounded-3xl border border-orange-200 bg-gradient-to-br from-orange-50 to-white p-5 shadow-xl shadow-orange-100/70 dark:border-orange-500/25 dark:from-orange-500/10 dark:to-slate-900 dark:shadow-black/25">
+      <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-700 dark:text-orange-300">
+        Quote summary
+      </p>
+      <h2 className="mt-2 text-xl font-black text-slate-950 dark:text-white">
+        Ready to confirm
+      </h2>
 
-      <div className="space-y-2 text-sm">
+      <div className="mt-5 space-y-3 text-sm">
         <Row label="Track" value={`$${quote.track_price}`} />
         {quote.coach_price != null && quote.coach_price > 0 && (
           <Row label="Coach" value={`$${quote.coach_price}`} />
         )}
         <Row label="Subtotal" value={`$${quote.subtotal}`} />
-        {quote.tax > 0 && <Row label="Tax" value={`$${quote.tax}`} />}
-        <div className="border-t border-orange-500/20 pt-3 flex justify-between items-center">
-          <span className="font-semibold text-white">Total</span>
-          <span className="text-2xl font-bold text-orange-400">${quote.total}</span>
+        <div className="flex items-center justify-between border-t border-orange-200 pt-4 dark:border-orange-500/20">
+          <span className="font-black text-slate-950 dark:text-white">Total</span>
+          <span className="text-3xl font-black text-orange-600 dark:text-orange-300">
+            ${quote.total}
+          </span>
         </div>
       </div>
 
       {!quote.availability_available && (
-        <div className="mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-sm">
+        <div className="mt-4 rounded-2xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-300">
           This time slot is no longer available. Please choose another.
         </div>
       )}
@@ -47,7 +52,7 @@ export function QuoteSummary({ quote, submitting, onConfirm }: QuoteSummaryProps
           isLoading={submitting}
           disabled={submitting}
         >
-          {submitting ? 'Confirming...' : `Confirm booking · $${quote.total}`}
+          {submitting ? 'Confirming...' : `Confirm booking - $${quote.total}`}
         </Button>
       )}
     </div>
@@ -56,9 +61,9 @@ export function QuoteSummary({ quote, submitting, onConfirm }: QuoteSummaryProps
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between text-gray-300">
+    <div className="quote-card flex justify-between rounded-2xl border border-slate-200 bg-white/70 px-3 py-2 text-slate-600 dark:border-slate-700 dark:bg-slate-950/40 dark:text-slate-300">
       <span>{label}</span>
-      <span>{value}</span>
+      <span className="font-black text-slate-950 dark:text-white">{value}</span>
     </div>
   );
 }

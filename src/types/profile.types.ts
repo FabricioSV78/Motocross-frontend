@@ -16,8 +16,16 @@ export interface UserProfile {
   nombre: string;
   foto: string | null;
   foto_moto: string | null;
-  nivel: UserLevel;
+  nivel?: UserLevel;
   moto: string | null;
+  
+  // Coach specific fields
+  role?: string;
+  status?: string;
+  telefono?: string | null;
+  bio?: string | null;
+  experience?: string | null;
+  certificate_url?: string | null;
 }
 
 /**
@@ -29,6 +37,11 @@ export interface UpdateProfileData {
   foto_moto?: string | null;
   nivel?: UserLevel;
   moto?: string | null;
+  
+  // Coach specific fields
+  telefono?: string | null;
+  bio?: string | null;
+  experience?: string | null;
 }
 
 /**

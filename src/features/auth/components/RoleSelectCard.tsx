@@ -8,18 +8,21 @@ interface RoleSelectCardProps {
 
 const ACCENT: Record<RoleSelectCardProps['accent'], { border: string; badge: string; dot: string }> = {
   orange: {
-    border: 'hover:border-orange-500/40',
-    badge: 'text-orange-400 bg-orange-500/10 border-orange-500/30',
+    border: 'hover:border-orange-400 dark:hover:border-orange-500/50',
+    badge:
+      'border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-300',
     dot: 'bg-orange-500',
   },
   blue: {
-    border: 'hover:border-blue-500/40',
-    badge: 'text-blue-400 bg-blue-500/10 border-blue-500/30',
-    dot: 'bg-blue-500',
+    border: 'hover:border-sky-400 dark:hover:border-sky-500/50',
+    badge:
+      'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300',
+    dot: 'bg-sky-500',
   },
   green: {
-    border: 'hover:border-emerald-500/40',
-    badge: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
+    border: 'hover:border-emerald-400 dark:hover:border-emerald-500/50',
+    badge:
+      'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300',
     dot: 'bg-emerald-500',
   },
 };
@@ -37,15 +40,13 @@ export function RoleSelectCard({
     <button
       type="button"
       onClick={onClick}
-      className={`group w-full text-left rounded-xl border border-gray-700/80 bg-gray-800/30 p-6 transition-all duration-200 ${styles.border} hover:bg-gray-800/50`}
+      className={`group w-full rounded-2xl border border-slate-200/90 bg-white/85 p-6 text-left shadow-xl shadow-slate-200/60 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white dark:border-slate-700/80 dark:bg-slate-900/50 dark:shadow-black/20 dark:hover:bg-slate-900/80 ${styles.border}`}
     >
-      <span className={`inline-block w-2 h-2 rounded-full mb-4 ${styles.dot}`} />
-      <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
-      <p className="text-gray-400 text-sm leading-relaxed mb-4">{description}</p>
-      <span
-        className={`inline-block text-xs font-semibold px-3 py-1.5 rounded-lg border ${styles.badge}`}
-      >
-        {actionLabel} →
+      <span className={`mb-4 inline-block h-2 w-2 rounded-full ${styles.dot}`} />
+      <h3 className="mb-2 text-lg font-bold text-slate-950 dark:text-white">{title}</h3>
+      <p className="mb-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{description}</p>
+      <span className={`inline-block rounded-lg border px-3 py-1.5 text-xs font-bold ${styles.badge}`}>
+        {actionLabel} -&gt;
       </span>
     </button>
   );

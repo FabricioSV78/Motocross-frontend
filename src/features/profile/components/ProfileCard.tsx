@@ -13,6 +13,7 @@ interface ProfileCardProps {
 export function ProfileCard({ profile }: ProfileCardProps) {
   const motoUrl = getMediaUrl(profile.foto_moto);
   const avatarUrl = getMediaUrl(profile.foto);
+  const level = profile.nivel ?? 'BEGINNER';
 
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700 overflow-hidden flex flex-col sm:flex-row min-h-[320px]">
@@ -41,8 +42,8 @@ export function ProfileCard({ profile }: ProfileCardProps) {
           <div className="min-w-0">
             <h2 className="text-xl font-bold text-white truncate">{profile.nombre}</h2>
             <p className="text-sm text-gray-400 truncate mt-0.5">{profile.email}</p>
-            <span className={`inline-flex mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${USER_LEVEL_COLORS[profile.nivel]}`}>
-              {USER_LEVEL_LABELS[profile.nivel]}
+            <span className={`inline-flex mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${USER_LEVEL_COLORS[level]}`}>
+              {USER_LEVEL_LABELS[level]}
             </span>
           </div>
         </div>

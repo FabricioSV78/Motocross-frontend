@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
-import { Button } from '@/components/ui/Button';
+import { Button, DatePickerField, DateRangePickerField, SelectField } from '@/components/ui';
 import type { TrackRefResponse, ServiceItemResponse } from '@/services/coachSettingsService';
 import type { AvailableSlot } from '@/services/trackService';
-import { WEEKDAYS, TODAY, generateDates } from './coachAvailabilityUtils';
+import { TODAY, generateDates } from './coachAvailabilityUtils';
 
 type Mode = 'single' | 'weekly';
 
@@ -16,7 +16,6 @@ export interface AvailabilityFormState {
   date: string;
   fromDate: string;
   toDate: string;
-  weekdays: number[];
 }
 
 interface CoachAvailabilityFormProps {
@@ -35,7 +34,6 @@ interface CoachAvailabilityFormProps {
     key: K,
     value: AvailabilityFormState[K]
   ) => void;
-  onToggleWeekday: (value: number) => void;
   onTrackSlotSelect: (slot: AvailableSlot) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
@@ -53,13 +51,12 @@ export function CoachAvailabilityForm({
   success,
   onModeChange,
   onFieldChange,
-  onToggleWeekday,
   onTrackSlotSelect,
   onSubmit,
 }: CoachAvailabilityFormProps) {
   const previewDates =
     state.mode === 'weekly'
-      ? generateDates(state.fromDate, state.toDate, state.weekdays)
+      ? generateDates(state.fromDate, state.toDate)
       : [];
 
   if (coachTracks.length === 0) {
@@ -138,34 +135,34 @@ export function CoachAvailabilityForm({
           </legend>
 
           <Field label="Track" required>
-            <select
+            <SelectField
               value={state.trackId}
-              onChange={(e) => onFieldChange('trackId', e.target.value)}
-              required
+              onChange={(value) => onFieldChange('trackId', value)}
               className={inputClass}
-            >
-              {coachTracks.map((t) => (
-                <option key={t.trackId} value={String(t.trackId)}>
-                  {t.trackName}
-                </option>
-              ))}
-            </select>
+              options={coachTracks.map((track) => ({
+                value: String(track.trackId),
+                label: track.trackName,
+              }))}
+              ariaLabel="Track"
+            />
           </Field>
 
           <Field label="Service" required hint="Rates come from your settings">
-            <select
+            <SelectField
               value={state.selectedServiceId}
-              onChange={(e) => onFieldChange('selectedServiceId', e.target.value)}
-              required
+              onChange={(value) => onFieldChange('selectedServiceId', value)}
               className={inputClass}
-            >
-              <option value="">Select a service</option>
-              {coachServices.map((service) => (
-                <option key={service.id} value={String(service.id)}>
-                  {formatServiceLabel(service)}
-                </option>
-              ))}
-            </select>
+              options={[
+                { value: '', label: 'Select a service' },
+                ...coachServices
+                  .filter((service) => service.mode === 'ONE_TO_ONE')
+                  .map((service) => ({
+                    value: String(service.id),
+                    label: formatServiceLabel(service),
+                  })),
+              ]}
+              ariaLabel="Service"
+            />
             {selectedService && (
               <p className="mt-2 rounded-lg border border-gray-700 bg-gray-900/60 px-3 py-2 text-xs leading-relaxed text-gray-400">
                 {getServiceGuidance(selectedService)}
@@ -181,16 +178,14 @@ export function CoachAvailabilityForm({
 
           {state.mode === 'single' ? (
             <>
-              <Field label="Date" required>
-                <input
-                  type="date"
-                  required
-                  value={state.date}
-                  min={TODAY}
-                  onChange={(e) => onFieldChange('date', e.target.value)}
-                  className={inputClass}
-                />
-              </Field>
+              <DatePickerField
+                label="Date"
+                required
+                value={state.date}
+                minDateKey={TODAY}
+                onChange={(value) => onFieldChange('date', value)}
+                accent="emerald"
+              />
               <TrackWindowsGuide
                 date={state.date}
                 slots={trackSlots}
@@ -202,48 +197,19 @@ export function CoachAvailabilityForm({
             </>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="From" required>
-                  <input
-                    type="date"
-                    required
-                    value={state.fromDate}
-                    min={TODAY}
-                    onChange={(e) => onFieldChange('fromDate', e.target.value)}
-                    className={inputClass}
-                  />
-                </Field>
-                <Field label="To" required>
-                  <input
-                    type="date"
-                    required
-                    value={state.toDate}
-                    min={state.fromDate || TODAY}
-                    onChange={(e) => onFieldChange('toDate', e.target.value)}
-                    className={inputClass}
-                  />
-                </Field>
-              </div>
-
-              <div>
-                <span className="block text-xs text-gray-400 mb-2">Weekdays</span>
-                <div className="flex gap-2">
-                  {WEEKDAYS.map(({ label, value }) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => onToggleWeekday(value)}
-                      className={`flex-1 h-10 rounded-lg text-sm font-bold transition-all ${
-                        state.weekdays.includes(value)
-                          ? 'bg-orange-500 text-white'
-                          : 'bg-gray-800 text-gray-400 border border-gray-600 hover:border-gray-500'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <DateRangePickerField
+                label="Date range"
+                required
+                fromValue={state.fromDate}
+                toValue={state.toDate}
+                minDateKey={TODAY}
+                onChange={(nextFromDate, nextToDate) => {
+                  onFieldChange('fromDate', nextFromDate);
+                  onFieldChange('toDate', nextToDate);
+                }}
+                accent="emerald"
+                hint="Select the first day, then the last day. The range will be highlighted."
+              />
 
               {(state.fromDate || state.toDate) && (
                 <div
@@ -257,8 +223,6 @@ export function CoachAvailabilityForm({
                     ? `${weeklyMatchingDates.length} of ${previewDates.length} date${previewDates.length !== 1 ? 's' : ''} match your selected hours`
                     : previewDates.length > 0
                       ? `${previewDates.length} date${previewDates.length !== 1 ? 's' : ''} selected. Choose a track window below.`
-                    : state.weekdays.length === 0
-                      ? 'Select at least one weekday'
                       : 'No valid dates in this range'}
                 </div>
               )}
@@ -475,7 +439,7 @@ function WeeklyTrackWindowsGuide({
   if (dates.length === 0) {
     return (
       <div className="rounded-lg border border-gray-700 bg-gray-900/50 px-4 py-3 text-sm text-gray-400">
-        Choose a date range and weekdays to preview track windows.
+        Choose a date range to preview track windows.
       </div>
     );
   }
@@ -636,11 +600,7 @@ function formatServiceLabel(service: ServiceItemResponse) {
       : service.classType === 'HALF_DAY'
         ? 'Half day'
         : 'Full day';
-  const mode =
-    service.mode === 'ONE_TO_ONE'
-      ? '1:1'
-      : `Group (max ${service.maxStudents})`;
-  return `${type} - ${mode} - $${service.price}`;
+  return `${type} - 1:1 - $${service.price}`;
 }
 
 function getServiceGuidance(service: ServiceItemResponse) {

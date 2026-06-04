@@ -40,13 +40,14 @@ export function CoachSettingsPage() {
       .then(([tracks, settings]: [AllTracksItem[], CoachSettingsGetResponse]) => {
         setAllTracks(tracks);
         setSelectedTrackIds(settings.tracks.map((t) => t.trackId));
-        if (settings.services.length > 0) {
+        const oneToOneServices = settings.services.filter((s) => s.mode === 'ONE_TO_ONE');
+        if (oneToOneServices.length > 0) {
           setServices(
-            settings.services.map((s) => ({
+            oneToOneServices.map((s) => ({
               classType: s.classType as ClassType,
-              mode: s.mode as ClassMode,
+              mode: 'ONE_TO_ONE' as ClassMode,
               price: String(s.price),
-              maxStudents: String(s.maxStudents),
+              maxStudents: '1',
             }))
           );
         }
@@ -91,18 +92,11 @@ export function CoachSettingsPage() {
         setError(`Service ${i + 1}: enter a price greater than 0.`);
         return;
       }
-      if (s.mode === 'GROUP') {
-        const max = parseInt(s.maxStudents, 10);
-        if (isNaN(max) || max < 2) {
-          setError(`Service ${i + 1}: group sessions need at least 2 students.`);
-          return;
-        }
-      }
     }
 
-    const combos = services.map((s) => `${s.classType}/${s.mode}`);
+    const combos = services.map((s) => `${s.classType}/ONE_TO_ONE`);
     if (combos.length !== new Set(combos).size) {
-      setError('Duplicate services: each class type and mode combination must be unique.');
+      setError('Duplicate services: each class type can only be configured once for 1:1 lessons.');
       return;
     }
 
@@ -112,9 +106,9 @@ export function CoachSettingsPage() {
         tracks: selectedTrackIds.map((id) => ({ trackId: id })),
         services: services.map((s) => ({
           classType: s.classType,
-          mode: s.mode,
+          mode: 'ONE_TO_ONE',
           price: parseFloat(s.price),
-          maxStudents: s.mode === 'GROUP' ? parseInt(s.maxStudents, 10) : undefined,
+          maxStudents: undefined,
         } satisfies ServiceItem)),
       });
       setSuccess(res.message);

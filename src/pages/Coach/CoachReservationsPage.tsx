@@ -2,9 +2,10 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { reservationService } from '@/services/reservationService';
 import { formatDate, formatTime } from '@/utils/date';
-import { getReservationFields, type ReservationRow } from '@/utils/reservationFields';
+import { getReservationFields, sortReservationsBySchedule, type ReservationRow } from '@/utils/reservationFields';
 import { ROUTES } from '@/router/routes';
 import { Button } from '@/components/ui/Button';
+import { PaginationControls } from '@/components/common/PaginationControls';
 import {
   PageHeader,
   StatusBadge,
@@ -12,23 +13,24 @@ import {
   ReservationCardSkeleton,
 } from '@/components/pilot';
 
-type FilterKey = 'all' | 'upcoming' | 'CONFIRMED' | 'PENDING_PAYMENT' | 'CANCELLED' | 'past';
+type FilterKey = 'all' | 'CONFIRMED' | 'CANCELLED' | 'PAST';
 
 const FILTERS: { value: FilterKey; label: string }[] = [
   { value: 'all', label: 'All' },
-  { value: 'upcoming', label: 'Upcoming' },
   { value: 'CONFIRMED', label: 'Confirmed' },
-  { value: 'PENDING_PAYMENT', label: 'Pending' },
   { value: 'CANCELLED', label: 'Cancelled' },
-  { value: 'past', label: 'Past' },
+  { value: 'PAST', label: 'Past' },
 ];
+
+const CARDS_PER_PAGE = 10;
 
 export function CoachReservationsPage() {
   const [reservations, setReservations] = useState<ReservationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<FilterKey>('upcoming');
+  const [filter, setFilter] = useState<FilterKey>('all');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
 
   const loadReservations = useCallback(async () => {
     try {
@@ -53,36 +55,27 @@ export function CoachReservationsPage() {
   }, [loadReservations]);
 
   const counts = useMemo(() => {
-    const today = getTodayStart();
     return {
       all: reservations.length,
-      upcoming: reservations.filter((r) => isUpcomingActiveLesson(r, today)).length,
       CONFIRMED: reservations.filter((r) => r.status === 'CONFIRMED').length,
-      PENDING_PAYMENT: reservations.filter((r) => r.status === 'PENDING_PAYMENT').length,
       CANCELLED: reservations.filter((r) => r.status === 'CANCELLED').length,
-      past: reservations.filter((r) => getReservationDay(r) < today).length,
+      PAST: reservations.filter((r) => r.status === 'PAST').length,
     };
   }, [reservations]);
 
   const expectedEarnings = useMemo(
     () =>
       reservations
-        .filter((r) => r.status !== 'CANCELLED')
+        .filter((r) => r.status === 'CONFIRMED')
         .reduce((sum, r) => sum + Number(r.coachEarnings ?? r.coachPrice ?? 0), 0),
     [reservations]
   );
 
   const filtered = useMemo(() => {
-    const today = getTodayStart();
     const q = search.trim().toLowerCase();
 
     return reservations.filter((r) => {
-      const resDate = getReservationDay(r);
-      const matchesFilter =
-        filter === 'all' ||
-        (filter === 'upcoming' && isUpcomingActiveLesson(r, today)) ||
-        (filter === 'past' && resDate < today) ||
-        r.status === filter;
+      const matchesFilter = filter === 'all' || r.status === filter;
 
       const matchesSearch =
         !q ||
@@ -93,6 +86,21 @@ export function CoachReservationsPage() {
       return matchesFilter && matchesSearch;
     });
   }, [reservations, filter, search]);
+
+  const ordered = useMemo(() => sortReservationsBySchedule(filtered), [filtered]);
+  const pageCount = Math.max(1, Math.ceil(ordered.length / CARDS_PER_PAGE));
+  const currentPageItems = useMemo(
+    () => ordered.slice((page - 1) * CARDS_PER_PAGE, page * CARDS_PER_PAGE),
+    [ordered, page]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [filter, search, reservations]);
+
+  useEffect(() => {
+    if (page > pageCount) setPage(pageCount);
+  }, [page, pageCount]);
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -117,8 +125,8 @@ export function CoachReservationsPage() {
         <div className="mb-6 space-y-4">
           <div className="grid gap-3 sm:grid-cols-4">
             <StatCard label="Total" value={counts.all} />
-            <StatCard label="Upcoming" value={counts.upcoming} />
             <StatCard label="Confirmed" value={counts.CONFIRMED} />
+            <StatCard label="Past" value={counts.PAST} />
             <StatCard label="Expected earnings" value={`$${expectedEarnings.toFixed(2)}`} />
           </div>
 
@@ -187,10 +195,20 @@ export function CoachReservationsPage() {
 
       {!loading && filtered.length > 0 && (
         <div className="space-y-3">
-          {filtered.map((lesson) => (
+          {currentPageItems.map((lesson) => (
             <LessonCard key={lesson.id} lesson={lesson} />
           ))}
         </div>
+      )}
+
+      {!loading && filtered.length > 0 && (
+        <PaginationControls
+          page={page}
+          pageCount={pageCount}
+          pageSize={CARDS_PER_PAGE}
+          totalItems={ordered.length}
+          onPageChange={setPage}
+        />
       )}
     </div>
   );
@@ -230,11 +248,6 @@ function LessonCard({ lesson }: { lesson: ReservationRow }) {
         <MoneyItem label="Booking total" value={lesson.totalAmount} />
       </div>
 
-      {lesson.status === 'PENDING_PAYMENT' && (
-        <p className="mt-3 rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
-          This lesson is not confirmed until payment is completed.
-        </p>
-      )}
     </article>
   );
 }
@@ -276,26 +289,10 @@ function StatCard({ label, value }: { label: string; value: number | string }) {
   );
 }
 
-function getTodayStart() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return today;
-}
-
-function getReservationDay(lesson: ReservationRow) {
-  const date = new Date(`${lesson.reservationDate}T12:00:00`);
-  date.setHours(0, 0, 0, 0);
-  return date;
-}
-
-function isUpcomingActiveLesson(lesson: ReservationRow, today: Date) {
-  return getReservationDay(lesson) >= today && lesson.status !== 'CANCELLED';
-}
-
 function formatLessonType(lesson: ReservationRow) {
   if (!lesson.classType) return 'Not specified';
   const type = formatValue(lesson.classType);
-  const mode = lesson.classMode ? ` - ${formatValue(lesson.classMode)}` : '';
+  const mode = lesson.classMode === 'ONE_TO_ONE' ? ' - 1:1' : '';
   return `${type}${mode}`;
 }
 

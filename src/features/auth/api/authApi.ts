@@ -62,6 +62,7 @@ export interface LoginData {
 export interface AuthUser {
   id: number;
   email: string;
+  nombre: string;
 }
 
 /**
@@ -89,11 +90,11 @@ export interface ApiError {
  */
 export const authApi = {
   /**
-   * Registra un nuevo usuario en el sistema
-   * @param data - Datos del usuario (email, password, nombre)
-   * @returns Promise con la respuesta de autenticación
-   * @throws Error si el registro falla
-   */
+    * Registra un nuevo usuario en el sistema
+    * @param data - Datos del usuario (email, password, nombre)
+    * @returns Promise con la respuesta de autenticación
+    * @throws Error si el registro falla
+    */
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
       const response = await apiClient.post<AuthResponse>('/auth/register', {
@@ -104,25 +105,25 @@ export const authApi = {
       
       return response.data;
     } catch (error) {
-      // Extraer mensaje de error del backend
       const axiosError = error as AxiosError<ApiError>;
       const apiError = axiosError.response?.data;
       const errorMessage = 
         apiError?.detail || 
         apiError?.message || 
-        'Error al registrar usuario. Intenta nuevamente.';
+        'Error registering user. Try again.';
       
       throw new Error(errorMessage);
     }
   },
 
   /**
-   * Registra una nueva empresa en el sistema
-   * @param data - Datos de la empresa (email, password, nombre_empresa, telefono)
-   * @returns Promise con la respuesta
-   * @throws Error si el registro falla
-   */
-  async registerCompany(data: RegisterCompanyData): Promise<{ message: string }> {    try {
+    * Registra una nueva empresa en el sistema
+    * @param data - Datos de la empresa (email, password, nombre_empresa, telefono)
+    * @returns Promise con la respuesta
+    * @throws Error si el registro falla
+    */
+  async registerCompany(data: RegisterCompanyData): Promise<{ message: string }> {
+    try {
       const response = await apiClient.post<{ message: string }>('/auth/register-company', {
         email: data.email,
         password: data.password,
@@ -132,24 +133,23 @@ export const authApi = {
       
       return response.data;
     } catch (error) {
-      // Extraer mensaje de error del backend
       const axiosError = error as AxiosError<ApiError>;
       const apiError = axiosError.response?.data;
       const errorMessage = 
         apiError?.detail || 
         apiError?.message || 
-        'Error al registrar empresa. Intenta nuevamente.';
+        'Error registering company. Try again.';
       
       throw new Error(errorMessage);
     }
   },
 
   /**
-   * Inicia sesión con credenciales de usuario
-   * @param data - Credenciales (email, password)
-   * @returns Promise con la respuesta de autenticación
-   * @throws Error si el login falla
-   */
+    * Inicia sesión con credenciales de usuario
+    * @param data - Credenciales (email, password)
+    * @returns Promise con la respuesta de autenticación
+    * @throws Error si el login falla
+    */
   async login(data: LoginData): Promise<AuthResponse> {
     try {
       const response = await apiClient.post<AuthResponse>('/auth/login', data);
@@ -173,35 +173,34 @@ export const authApi = {
   },
 
   /**
-   * Cierra la sesión del usuario actual
-   * Llama al backend para invalidar el token y limpia localStorage
-   */
+    * Cierra la sesión del usuario actual
+    * Llama al backend para invalidar el token y limpia localStorage
+    */
   async logout(): Promise<void> {
     try {
       await apiClient.post('/auth/logout');
     } catch (error) {
       console.error('Error during logout:', error);
     } finally {
-      // Siempre remover el token y usuario localmente
       clearAuthStorage();
     }
   },
 
   /**
-   * Obtiene el usuario autenticado actual
-   * @returns Promise con los datos del usuario
-   */
+    * Obtiene el usuario autenticado actual
+    * @returns Promise con los datos del usuario
+    */
   async getCurrentUser(): Promise<User> {
     const response = await apiClient.get<User>('/auth/me');
     return response.data;
   },
 
   /**
-   * HU-03: Registra un nuevo coach en el sistema
-   * @param data - Datos del coach (email, password, nombre, telefono, experience)
-   * @returns Promise con el coach creado
-   * @throws Error si el registro falla
-   */
+    * HU-03: Registra un nuevo coach en el sistema
+    * @param data - Datos del coach (email, password, nombre, telefono, experience)
+    * @returns Promise con el coach creado
+    * @throws Error si el registro falla
+    */
   async registerCoach(data: RegisterCoachData): Promise<RegisterCoachResponse> {
     try {
       const response = await apiClient.post<RegisterCoachResponse>('/auth/register-coach', {
@@ -224,10 +223,10 @@ export const authApi = {
   },
 
   /**
-   * HU-09: Sube el certificado del coach autenticado
-   * @param file - Archivo PDF o imagen
-   * @returns Promise con mensaje de confirmación
-   */
+    * HU-09: Sube el certificado del coach autenticado
+    * @param file - Archivo PDF o imagen
+    * @returns Promise con mensaje de confirmación
+    */
   async uploadCertificate(file: File): Promise<{ message: string }> {
     const formData = new FormData();
     formData.append('file', file);

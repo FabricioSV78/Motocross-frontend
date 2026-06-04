@@ -40,16 +40,20 @@
 
 /* Estilos globales */
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: "Aptos", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --app-accent: #f97316;
+  --app-accent-strong: #ea580c;
+  --app-success: #10b981;
+  --app-surface: rgba(255, 255, 255, 0.88);
+  --app-surface-dark: rgba(15, 23, 42, 0.82);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  text-rendering: optimizeLegibility;
 }
 
 #root {
@@ -244,7 +248,6 @@ html:not(.dark) ::-webkit-scrollbar-track {
 html:not(.dark) .theme-on-accent,
 html:not(.dark) .theme-on-accent *,
 html:not(.dark) .theme-fixed-dark,
-html:not(.dark) .theme-fixed-dark *,
 html:not(.dark) .bg-orange-500.text-white,
 html:not(.dark) .bg-orange-600.text-white,
 html:not(.dark) .bg-red-500.text-white,
@@ -354,6 +357,25 @@ html:not(.dark) .from-orange-600.text-white {
   color: #fff !important;
 }
 
+html:not(.dark) .theme-fixed-dark .text-white {
+  color: #fff !important;
+}
+
+html:not(.dark) .theme-fixed-dark .text-neutral-300 {
+  color: #d4d4d4 !important;
+}
+
+html:not(.dark) .theme-fixed-dark .text-orange-300,
+html:not(.dark) .theme-fixed-dark .text-orange-400 {
+  color: #fdba74 !important;
+}
+
+html:not(.dark) .theme-fixed-dark .border-white\/15,
+html:not(.dark) .theme-fixed-dark .border-white\/20,
+html:not(.dark) .theme-fixed-dark .border-white\/25 {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
 /* ===== LEAFLET MAP THEME ===== */
 .track-map {
   background: #e2e8f0;
@@ -433,4 +455,402 @@ html.dark .track-map-popup .leaflet-popup-tip {
 
 html.dark .marker-cluster div {
   border-color: #0f172a;
+}
+
+/* Booking checkout: explicit theme surfaces for reliable contrast. */
+html.dark .quote-shell {
+  background: rgba(15, 23, 42, 0.96) !important;
+  border-color: rgba(51, 65, 85, 0.95) !important;
+  color: #f8fafc;
+}
+
+html.dark .quote-panel {
+  background: rgba(2, 6, 23, 0.78) !important;
+  border-color: rgba(71, 85, 105, 0.9) !important;
+}
+
+html.dark .quote-card,
+html.dark .quote-input,
+html.dark .quote-calendar-popover {
+  background: #0f172a !important;
+  border-color: rgba(71, 85, 105, 0.95) !important;
+  color: #f8fafc !important;
+}
+
+html.dark .quote-input select,
+html.dark select.quote-input,
+html.dark .quote-input option {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+html.dark .quote-option {
+  background: #0f172a !important;
+  border-color: rgba(71, 85, 105, 0.95) !important;
+  color: #f8fafc !important;
+}
+
+html.dark .quote-option:hover {
+  border-color: rgba(249, 115, 22, 0.65) !important;
+  background: #111827 !important;
+}
+
+html.dark .quote-option-selected {
+  background: rgba(124, 45, 18, 0.48) !important;
+  border-color: #f97316 !important;
+  box-shadow: 0 18px 40px rgba(249, 115, 22, 0.12);
+}
+
+html.dark .quote-summary {
+  background:
+    linear-gradient(145deg, rgba(124, 45, 18, 0.2), rgba(15, 23, 42, 0.98)) !important;
+  border-color: rgba(249, 115, 22, 0.34) !important;
+}
+
+/* ===== REACT CALENDAR THEME ===== */
+.motocross-calendar {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #0f172a;
+  font-family: inherit;
+}
+
+.motocross-calendar button {
+  border: 0;
+  color: inherit;
+}
+
+.motocross-calendar .react-calendar__navigation {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr 2.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.motocross-calendar .react-calendar__navigation__label {
+  min-height: 2.5rem;
+  border-radius: 1rem;
+  background: rgba(248, 250, 252, 0.9);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+}
+
+.motocross-calendar .react-calendar__navigation__arrow {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  background: rgba(248, 250, 252, 0.9);
+  color: #475569;
+  transition: all 160ms ease;
+}
+
+.motocross-calendar .react-calendar__navigation__arrow:hover,
+.motocross-calendar .react-calendar__navigation__label:hover {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.motocross-calendar .react-calendar__month-view__weekdays {
+  margin-bottom: 0.35rem;
+  text-align: center;
+}
+
+.motocross-calendar .react-calendar__month-view__weekdays__weekday {
+  padding: 0.4rem 0;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.motocross-calendar .react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+}
+
+.motocross-calendar .react-calendar__tile {
+  position: relative;
+  min-height: clamp(3.45rem, 6.4vw, 4.15rem);
+  border-radius: 1rem;
+  padding: 0.65rem 0.35rem;
+  background: transparent;
+  color: #334155;
+  font-weight: 800;
+  transition: all 160ms ease;
+}
+
+.motocross-calendar.calendar-density-compact .react-calendar__navigation {
+  grid-template-columns: 2.15rem 1fr 2.15rem;
+  gap: 0.35rem;
+  margin-bottom: 0.45rem;
+}
+
+.motocross-calendar.calendar-density-compact .react-calendar__navigation__label,
+.motocross-calendar.calendar-density-compact .react-calendar__navigation__arrow {
+  min-height: 2.15rem;
+  border-radius: 0.8rem;
+}
+
+.motocross-calendar.calendar-density-compact .react-calendar__navigation__label {
+  font-size: 0.9rem;
+}
+
+.motocross-calendar.calendar-density-compact .react-calendar__month-view__weekdays {
+  margin-bottom: 0.15rem;
+}
+
+.motocross-calendar.calendar-density-compact .react-calendar__month-view__weekdays__weekday {
+  padding: 0.25rem 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+}
+
+.motocross-calendar.calendar-density-compact .react-calendar__month-view__days {
+  row-gap: 0.1rem;
+}
+
+.motocross-calendar.calendar-density-compact .react-calendar__tile {
+  min-height: clamp(2.35rem, 5.4vw, 2.85rem);
+  border-radius: 0.72rem;
+  padding: 0.35rem 0.2rem;
+  font-size: 0.82rem;
+}
+
+.motocross-calendar.calendar-density-compact .has-availability:not(.react-calendar__tile--active)::after {
+  right: 0.45rem;
+  top: 0.42rem;
+  width: 0.34rem;
+  height: 0.34rem;
+}
+
+.motocross-calendar.calendar-density-compact .calendar-tile-summary {
+  display: none;
+}
+
+.motocross-calendar.calendar-density-spacious .react-calendar__navigation {
+  grid-template-columns: 2.75rem 1fr 2.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.motocross-calendar.calendar-density-spacious .react-calendar__navigation__label,
+.motocross-calendar.calendar-density-spacious .react-calendar__navigation__arrow {
+  min-height: 2.75rem;
+}
+
+.motocross-calendar.calendar-density-spacious .react-calendar__tile {
+  min-height: clamp(3.85rem, 5.8vw, 4.95rem);
+}
+
+.motocross-calendar .react-calendar__tile:hover,
+.motocross-calendar .react-calendar__tile:focus {
+  background: rgba(255, 237, 213, 0.82);
+  color: #9a3412;
+  outline: none;
+}
+
+.motocross-calendar .react-calendar__month-view__days__day--neighboringMonth {
+  opacity: 0.38;
+}
+
+.motocross-calendar .react-calendar__tile--now {
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+}
+
+.motocross-calendar .react-calendar__tile--active,
+.motocross-calendar .is-soft-selected {
+  background: linear-gradient(135deg, #f97316, #dc2626) !important;
+  color: #fff !important;
+  box-shadow: 0 14px 30px rgba(234, 88, 12, 0.28);
+}
+
+.motocross-calendar.calendar-range .react-calendar__tile--range {
+  background: rgba(249, 115, 22, 0.14);
+  color: #9a3412;
+}
+
+.motocross-calendar.calendar-range.calendar-accent-emerald .react-calendar__tile--range {
+  background: rgba(16, 185, 129, 0.14);
+  color: #047857;
+}
+
+.motocross-calendar.calendar-range .react-calendar__tile--rangeStart,
+.motocross-calendar.calendar-range .react-calendar__tile--rangeEnd,
+.motocross-calendar.calendar-range .react-calendar__tile--active {
+  background: linear-gradient(135deg, #f97316, #dc2626) !important;
+  color: #fff !important;
+  box-shadow: 0 14px 30px rgba(234, 88, 12, 0.24);
+}
+
+.motocross-calendar.calendar-range.calendar-accent-emerald .react-calendar__tile--rangeStart,
+.motocross-calendar.calendar-range.calendar-accent-emerald .react-calendar__tile--rangeEnd,
+.motocross-calendar.calendar-range.calendar-accent-emerald .react-calendar__tile--active {
+  background: linear-gradient(135deg, #10b981, #0f766e) !important;
+  color: #fff !important;
+  box-shadow: 0 14px 30px rgba(16, 185, 129, 0.22);
+}
+
+.motocross-calendar.calendar-range .react-calendar__tile--hover {
+  background: rgba(249, 115, 22, 0.1);
+  color: #9a3412;
+}
+
+.motocross-calendar.calendar-range.calendar-accent-emerald .react-calendar__tile--hover {
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+}
+
+.motocross-calendar .has-availability:not(.react-calendar__tile--active)::after {
+  position: absolute;
+  right: 0.65rem;
+  top: 0.62rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #f97316;
+  content: "";
+}
+
+.motocross-calendar .calendar-accent-emerald.has-availability:not(.react-calendar__tile--active)::after {
+  background: #10b981;
+}
+
+.motocross-calendar .calendar-tile-summary {
+  position: absolute;
+  inset-inline: 0.45rem;
+  bottom: 0.45rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(249, 115, 22, 0.12);
+  padding: 0.14rem 0.35rem;
+  color: #c2410c;
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.motocross-calendar .calendar-accent-emerald .calendar-tile-summary,
+.motocross-calendar .calendar-accent-emerald.calendar-tile-summary {
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+}
+
+.motocross-calendar .react-calendar__tile--active .calendar-tile-summary,
+.motocross-calendar .is-soft-selected .calendar-tile-summary {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.motocross-calendar .react-calendar__year-view__months,
+.motocross-calendar .react-calendar__decade-view__years,
+.motocross-calendar .react-calendar__century-view__decades {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.motocross-calendar .react-calendar__year-view__months .react-calendar__tile,
+.motocross-calendar .react-calendar__decade-view__years .react-calendar__tile,
+.motocross-calendar .react-calendar__century-view__decades .react-calendar__tile {
+  min-height: 3.25rem;
+  background: rgba(248, 250, 252, 0.88);
+}
+
+html.dark .motocross-calendar {
+  color: #f8fafc;
+}
+
+html.dark .motocross-calendar .react-calendar__navigation__label,
+html.dark .motocross-calendar .react-calendar__navigation__arrow {
+  background: rgba(15, 23, 42, 0.92);
+  color: #cbd5e1;
+}
+
+html.dark .motocross-calendar .react-calendar__navigation__arrow:hover,
+html.dark .motocross-calendar .react-calendar__navigation__label:hover {
+  background: rgba(249, 115, 22, 0.16);
+  color: #fdba74;
+}
+
+html.dark .motocross-calendar .react-calendar__month-view__weekdays__weekday {
+  color: #94a3b8;
+}
+
+html.dark .motocross-calendar .react-calendar__tile {
+  color: #dbeafe;
+}
+
+html.dark .motocross-calendar .react-calendar__tile:hover,
+html.dark .motocross-calendar .react-calendar__tile:focus {
+  background: rgba(249, 115, 22, 0.16);
+  color: #fed7aa;
+}
+
+html.dark .motocross-calendar .react-calendar__tile--now {
+  background: rgba(148, 163, 184, 0.12);
+  color: #f8fafc;
+}
+
+html.dark .motocross-calendar.calendar-range .react-calendar__tile--range {
+  background: rgba(249, 115, 22, 0.18);
+  color: #fed7aa;
+}
+
+html.dark .motocross-calendar.calendar-range.calendar-accent-emerald .react-calendar__tile--range {
+  background: rgba(16, 185, 129, 0.18);
+  color: #a7f3d0;
+}
+
+html.dark .motocross-calendar.calendar-range .react-calendar__tile--hover {
+  background: rgba(249, 115, 22, 0.14);
+  color: #fed7aa;
+}
+
+html.dark .motocross-calendar.calendar-range.calendar-accent-emerald .react-calendar__tile--hover {
+  background: rgba(16, 185, 129, 0.14);
+  color: #a7f3d0;
+}
+
+html.dark .motocross-calendar .calendar-tile-summary {
+  background: rgba(249, 115, 22, 0.18);
+  color: #fed7aa;
+}
+
+html.dark .motocross-calendar .calendar-accent-emerald .calendar-tile-summary,
+html.dark .motocross-calendar .calendar-accent-emerald.calendar-tile-summary {
+  background: rgba(16, 185, 129, 0.16);
+  color: #a7f3d0;
+}
+
+html.dark .motocross-calendar .react-calendar__year-view__months .react-calendar__tile,
+html.dark .motocross-calendar .react-calendar__decade-view__years .react-calendar__tile,
+html.dark .motocross-calendar .react-calendar__century-view__decades .react-calendar__tile {
+  background: rgba(15, 23, 42, 0.88);
+}
+
+@media (max-width: 640px) {
+  .motocross-calendar .react-calendar__tile {
+    min-height: 3.05rem;
+    border-radius: 0.8rem;
+    font-size: 0.82rem;
+  }
+
+  .motocross-calendar.calendar-density-compact .react-calendar__tile {
+    min-height: 2.25rem;
+    font-size: 0.78rem;
+  }
+
+  .motocross-calendar.calendar-density-spacious .react-calendar__tile {
+    min-height: 3.15rem;
+  }
+
+  .motocross-calendar .calendar-tile-summary {
+    display: none;
+  }
 }

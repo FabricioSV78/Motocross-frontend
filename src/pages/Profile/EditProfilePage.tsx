@@ -8,21 +8,16 @@ import { Button } from '@/components/ui/Button';
 import { userService } from '@/services/userService';
 import type { UpdateProfileData } from '@/types/profile.types';
 import { ROUTES } from '@/router/routes';
+import { useAuth } from '@/providers/useAuth';
 
 /**
- * Página de edición de perfil del piloto
- * HU-06: Editar perfil
- *
- * Flujo:
- * 1. Carga el perfil actual con GET /users/me/profile
- * 2. Pre-rellena el formulario
- * 3. Al enviar llama PUT /users/me
- * 4. Muestra feedback y redirige a /profile
+ * Página de edición de perfil del piloto y coach
  */
 export function EditProfilePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { profile, isLoading: isLoadingProfile, error: profileError } = useProfile();
+  const { user, updateUser } = useAuth();
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -36,9 +31,16 @@ export function EditProfilePage() {
     try {
       const updatedProfile = await userService.updateProfile(data);
 
-      // Actualizar la caché de React Query con los datos frescos del servidor.
-      // ProfilePage leerá estos datos inmediatamente sin necesidad de refetch.
+      // Actualizar la caché de React Query con los datos frescos del servidor
       queryClient.setQueryData(['profile', 'me'], updatedProfile);
+
+      // Sincronizar el nombre en el contexto de autenticación
+      if (user) {
+        updateUser({
+          ...user,
+          name: updatedProfile.nombre,
+        });
+      }
 
       setSaved(true);
       setTimeout(() => navigate(ROUTES.PROFILE), 1200);
@@ -85,37 +87,28 @@ export function EditProfilePage() {
 
   // ── Formulario ──────────────────────────────────────────────────────────────
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="mx-auto max-w-5xl px-4">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Edit profile</h1>
-        <p className="text-gray-400 text-sm">Fields marked with * are required</p>
+      <div className="mb-6">
+        <h1 className="mb-1.5 text-2xl font-bold text-slate-950 sm:text-3xl dark:text-white">Edit profile</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Update your information below</p>
       </div>
 
       {/* Feedback de éxito */}
       {saved && (
-        <div className="mb-6 p-4 rounded-lg bg-green-500/10 border border-green-500/30">
+        <div className="mb-4 p-4 rounded-lg bg-green-500/10 border border-green-500/30">
           <p className="text-green-400 font-medium">✅ Profile updated successfully</p>
         </div>
       )}
 
       {/* Formulario */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700 p-8">
+      <div className="bg-white dark:bg-gray-800/40 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 md:p-8">
         <EditProfileForm
           profile={profile}
           onSubmit={handleSubmit}
           isLoading={isSaving}
           errorMessage={saveError ?? undefined}
         />
-      </div>
-
-      {/* Cancelar */}
-      <div className="mt-6">
-        <Link to={ROUTES.PROFILE}>
-          <Button variant="outline" fullWidth>
-            Cancel
-          </Button>
-        </Link>
       </div>
     </div>
   );

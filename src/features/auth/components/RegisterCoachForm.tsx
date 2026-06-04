@@ -70,7 +70,7 @@ export function RegisterCoachForm() {
   };
 
   const textareaClass =
-    'w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 resize-none';
+    'w-full resize-none rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-950 placeholder-slate-400 shadow-sm transition focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/25 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:placeholder-slate-500 dark:focus:ring-orange-500/30';
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
@@ -101,7 +101,7 @@ export function RegisterCoachForm() {
           {...register('telefono')}
         />
         <div>
-          <label className="text-sm font-semibold text-gray-200">Experience (optional)</label>
+          <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Experience (optional)</label>
           <textarea
             placeholder="Years coaching, certifications, specialties..."
             rows={3}
@@ -110,7 +110,7 @@ export function RegisterCoachForm() {
             {...register('experience')}
           />
           {errors.experience && (
-            <p className="text-xs text-red-400 mt-1">{errors.experience.message}</p>
+            <p className="mt-1 text-xs text-red-600 dark:text-red-300">{errors.experience.message}</p>
           )}
         </div>
       </AuthFormSection>
