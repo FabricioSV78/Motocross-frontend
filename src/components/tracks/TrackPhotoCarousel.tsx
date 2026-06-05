@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { getMediaUrl } from '@/utils/media';
 
 interface TrackPhotoCarouselProps {
@@ -11,11 +11,7 @@ export function TrackPhotoCarousel({ photos, trackName }: TrackPhotoCarouselProp
     () => (photos ?? []).map((photo) => getMediaUrl(photo)).filter(Boolean) as string[],
     [photos]
   );
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [imageUrls.length]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   if (imageUrls.length === 0) {
     return (
@@ -28,15 +24,16 @@ export function TrackPhotoCarousel({ photos, trackName }: TrackPhotoCarouselProp
     );
   }
 
+  const activeIndex = Math.min(selectedIndex, imageUrls.length - 1);
   const activeImage = imageUrls[activeIndex];
   const hasMultipleImages = imageUrls.length > 1;
 
   function goToPrevious() {
-    setActiveIndex((current) => (current === 0 ? imageUrls.length - 1 : current - 1));
+    setSelectedIndex((current) => (current === 0 ? imageUrls.length - 1 : current - 1));
   }
 
   function goToNext() {
-    setActiveIndex((current) => (current === imageUrls.length - 1 ? 0 : current + 1));
+    setSelectedIndex((current) => (current === imageUrls.length - 1 ? 0 : current + 1));
   }
 
   return (
@@ -80,7 +77,7 @@ export function TrackPhotoCarousel({ photos, trackName }: TrackPhotoCarouselProp
             <button
               key={`${imageUrl}-${index}`}
               type="button"
-              onClick={() => setActiveIndex(index)}
+              onClick={() => setSelectedIndex(index)}
               className={`h-16 w-24 shrink-0 overflow-hidden rounded-md border transition ${
                 activeIndex === index
                   ? 'border-orange-500 ring-2 ring-orange-500/30'

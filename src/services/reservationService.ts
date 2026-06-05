@@ -1,24 +1,15 @@
-/**
- * Servicio Axios para Reservas y Pagos
- * Wrapper de endpoints de reservations
- */
-
 import { apiClient } from '@/lib/axios';
 import type {
+  CancelReservationResponse,
+  PaymentIntentResponse,
   ReservationCalculateRequest,
   ReservationCalculateResponse,
   ReservationCreateRequest,
-  PaymentIntentResponse,
-  ReservationListItem,
   ReservationDetail,
-  CancelReservationResponse,
+  ReservationListItem,
 } from '@/types/reservation.types';
 
 export const reservationService = {
-  /**
-   * HU-18: Calcular cotización
-   * POST /reservations/calculate
-   */
   async calculateQuote(
     request: ReservationCalculateRequest
   ): Promise<ReservationCalculateResponse> {
@@ -51,10 +42,6 @@ export const reservationService = {
     return response.data;
   },
 
-  /**
-   * HU-19: Crear reserva + obtener PaymentIntent
-   * POST /reservations
-   */
   async createReservation(
     request: ReservationCreateRequest
   ): Promise<PaymentIntentResponse> {
@@ -87,10 +74,6 @@ export const reservationService = {
     return response.data;
   },
 
-  /**
-   * Crear reserva confirmada directamente SIN pago
-   * POST /reservations/direct-confirm
-   */
   async createReservationDirectConfirm(
     request: ReservationCreateRequest
   ): Promise<{
@@ -132,34 +115,16 @@ export const reservationService = {
     return response.data;
   },
 
-  /**
-   * Listar todas las reservas del usuario
-   * GET /reservations
-   */
   async listMyReservations(): Promise<ReservationListItem[]> {
-    const response = await apiClient.get<ReservationListItem[]>(
-      '/reservations'
-    );
+    const response = await apiClient.get<ReservationListItem[]>('/reservations');
     return response.data;
   },
 
-  /**
-   * Obtener detalle de una reserva
-   * GET /reservations/{id}
-   */
-  async getReservationDetail(
-    reservationId: number
-  ): Promise<ReservationDetail> {
-    const response = await apiClient.get<ReservationDetail>(
-      `/reservations/${reservationId}`
-    );
+  async getReservationDetail(reservationId: number): Promise<ReservationDetail> {
+    const response = await apiClient.get<ReservationDetail>(`/reservations/${reservationId}`);
     return response.data;
   },
 
-  /**
-   * Cancelar una reserva propia del piloto
-   * PATCH /reservations/{id}/cancel
-   */
   async cancelReservation(reservationId: number): Promise<CancelReservationResponse> {
     const response = await apiClient.patch<CancelReservationResponse>(
       `/reservations/${reservationId}/cancel`
@@ -167,35 +132,13 @@ export const reservationService = {
     return response.data;
   },
 
-  /**
-   * Obtener todas las reservas del coach autenticado
-   * GET /reservations/coach/mine
-   */
   async listCoachReservations(): Promise<ReservationListItem[]> {
-    const response = await apiClient.get<ReservationListItem[]>(
-      '/reservations/coach/mine'
-    );
+    const response = await apiClient.get<ReservationListItem[]>('/reservations/coach/mine');
     return response.data;
   },
 
-  /**
-   * Obtener todas las reservas de una pista
-   * GET /reservations/track/{trackId}
-   */
   async listTrackReservations(trackId: number): Promise<ReservationListItem[]> {
-    const response = await apiClient.get<ReservationListItem[]>(
-      `/reservations/track/${trackId}`
-    );
-    return response.data;
-  },
-
-  /**
-   * Webhook de Stripe (normalmente se envía automáticamente desde Stripe)
-   * POST /webhooks/stripe
-   * NO se usa desde frontend, pero aquí para referencia
-   */
-  async notifyStripePayment(event: unknown): Promise<unknown> {
-    const response = await apiClient.post('/webhooks/stripe', event);
+    const response = await apiClient.get<ReservationListItem[]>(`/reservations/track/${trackId}`);
     return response.data;
   },
 };

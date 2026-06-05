@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import type { UpdateProfileData, UserLevel, UserProfile } from '@/types/profile.types';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -46,7 +46,7 @@ export function EditProfileForm({
     register,
     handleSubmit,
     reset,
-    watch,
+    control,
     setValue,
     formState: { errors },
   } = useForm<FormValues>({
@@ -63,7 +63,7 @@ export function EditProfileForm({
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [motoFile, setMotoFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const selectedLevel = watch('nivel');
+  const selectedLevel = useWatch({ control, name: 'nivel' });
 
   useEffect(() => {
     reset({
@@ -74,8 +74,6 @@ export function EditProfileForm({
       bio: profile.bio ?? '',
       experience: profile.experience ?? '',
     });
-    setAvatarFile(null);
-    setMotoFile(null);
   }, [profile, reset]);
 
   const handleFormSubmit = async (values: FormValues) => {
@@ -104,6 +102,7 @@ export function EditProfileForm({
         bio: values.bio?.trim() || null,
         experience: values.experience?.trim() || null,
       });
+      setAvatarFile(null);
       return;
     }
 
@@ -114,6 +113,8 @@ export function EditProfileForm({
       foto: fotoUrl,
       foto_moto: fotoMotoUrl,
     });
+    setAvatarFile(null);
+    setMotoFile(null);
   };
 
   return (

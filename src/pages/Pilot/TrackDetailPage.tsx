@@ -448,7 +448,7 @@ function CoachBookingCard({
 
   return (
     <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:border-gray-700/80 dark:bg-gray-800/40">
-      <div className="relative min-h-28 bg-gradient-to-br from-slate-950 via-slate-800 to-orange-950 p-4 text-white">
+      <div className="theme-fixed-dark relative min-h-28 bg-gradient-to-br from-slate-950 via-slate-800 to-orange-950 p-4 text-white">
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onShowInfo(); }}
@@ -476,11 +476,11 @@ function CoachBookingCard({
           <div className="min-w-0">
             <h3
               onClick={(e) => { e.stopPropagation(); onShowInfo(); }}
-              className="truncate text-lg font-bold cursor-pointer hover:text-orange-200 transition-colors"
+              className="truncate text-lg font-bold text-white drop-shadow-[0_1px_2px_rgba(15,23,42,0.72)] cursor-pointer transition-colors hover:text-orange-200"
             >
               {coach.name}
             </h3>
-            <p className="text-sm text-orange-100">Personal motocross coaching</p>
+            <p className="text-sm text-orange-100/95">Personal motocross coaching</p>
           </div>
         </div>
       </div>

@@ -239,14 +239,15 @@ export function MapPage() {
   const { computedMode } = useThemeMode();
   const isDark = computedMode === 'dark';
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
-  const [geoStatus, setGeoStatus] = useState<'pending' | 'granted' | 'denied'>('pending');
+  const [geoStatus, setGeoStatus] = useState<'pending' | 'granted' | 'denied'>(
+    () => (typeof navigator !== 'undefined' && navigator.geolocation ? 'pending' : 'denied')
+  );
   const [search, setSearch] = useState('');
   const [difficulty, setDifficulty] = useState<string>('ALL');
   const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!navigator.geolocation) {
-      setGeoStatus('denied');
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
       return;
     }
 
@@ -281,16 +282,14 @@ export function MapPage() {
     });
   }, [tracks, search, difficulty]);
 
-  useEffect(() => {
-    if (!selectedTrackId) return;
-    if (!filteredTracks.some((track) => track.id === selectedTrackId)) {
-      setSelectedTrackId(null);
-    }
-  }, [filteredTracks, selectedTrackId]);
+  const effectiveSelectedTrackId =
+    selectedTrackId != null && filteredTracks.some((track) => track.id === selectedTrackId)
+      ? selectedTrackId
+      : null;
 
   const selectedTrack = useMemo(
-    () => filteredTracks.find((track) => track.id === selectedTrackId) ?? null,
-    [filteredTracks, selectedTrackId],
+    () => filteredTracks.find((track) => track.id === effectiveSelectedTrackId) ?? null,
+    [effectiveSelectedTrackId, filteredTracks],
   );
 
   const averagePrice = useMemo(() => {
@@ -429,7 +428,7 @@ export function MapPage() {
                   <TrackResultCard
                     key={track.id}
                     track={track}
-                    selected={track.id === selectedTrackId}
+                    selected={track.id === effectiveSelectedTrackId}
                     onFocus={() => setSelectedTrackId(track.id)}
                     onOpen={() => navigate(ROUTES.TRACK_DETAIL(String(track.id)))}
                   />
@@ -457,15 +456,17 @@ export function MapPage() {
               </div>
             </div>
 
-            {(search || difficulty !== 'ALL') && (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="rounded-full border border-slate-200 bg-white/90 px-3 py-2 text-xs font-bold text-slate-700 shadow-lg shadow-slate-300/30 backdrop-blur-xl transition hover:border-orange-300 hover:text-orange-600 dark:border-slate-700 dark:bg-slate-950/88 dark:text-slate-300 dark:shadow-black/30 dark:hover:border-orange-500/50 dark:hover:text-orange-300"
-              >
-                Clear filters
-              </button>
-            )}
+            <div className="flex flex-wrap gap-2">
+              {(search || difficulty !== 'ALL') && (
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="rounded-full border border-slate-200 bg-white/90 px-3 py-2 text-xs font-bold text-slate-700 shadow-lg shadow-slate-300/30 backdrop-blur-xl transition hover:border-orange-300 hover:text-orange-600 dark:border-slate-700 dark:bg-slate-950/88 dark:text-slate-300 dark:shadow-black/30 dark:hover:border-orange-500/50 dark:hover:text-orange-300"
+                >
+                  Clear filters
+                </button>
+              )}
+            </div>
           </div>
 
           {isLoading && (
@@ -514,11 +515,15 @@ export function MapPage() {
               url={selectedTile.url}
             />
             <ZoomControl position="bottomright" />
-            <MapViewport tracks={filteredTracks} selectedTrack={selectedTrack} userPos={userPos} />
+            <MapViewport
+              tracks={filteredTracks}
+              selectedTrack={selectedTrack}
+              userPos={userPos}
+            />
             {filteredTracks.length > 0 && (
               <TrackMarkers
                 tracks={filteredTracks}
-                selectedTrackId={selectedTrackId}
+                selectedTrackId={effectiveSelectedTrackId}
                 isDark={isDark}
                 onSelect={(track) => setSelectedTrackId(track.id)}
               />
@@ -526,7 +531,9 @@ export function MapPage() {
             {userPos && (
               <Marker position={userPos} icon={userLocationIcon}>
                 <Popup className="track-map-popup">
-                  <strong>Your current location</strong>
+                  <div className="space-y-1 text-sm">
+                    <strong>Your current location</strong>
+                  </div>
                 </Popup>
               </Marker>
             )}

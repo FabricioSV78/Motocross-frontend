@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ComponentProps, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/providers/useAuth';
 import { LogoutButton } from '@/features/auth/components/LogoutButton';
@@ -277,10 +277,9 @@ function NavLink({
   ...props
 }: {
   to: string;
-  children: React.ReactNode;
+  children: ReactNode;
   active?: boolean;
-  [key: string]: any;
-}) {
+} & Omit<ComponentProps<typeof Link>, 'to' | 'className' | 'children'>) {
   return (
     <Link
       to={to}

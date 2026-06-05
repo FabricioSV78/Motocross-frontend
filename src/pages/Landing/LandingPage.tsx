@@ -240,7 +240,7 @@ function Hero({ onNavigate }: { onNavigate: (path: string) => void }) {
             <p className="mb-4 text-sm font-bold uppercase tracking-[0.28em] text-orange-300">
               Track booking, coaching, and scheduling
             </p>
-            <h1 className="max-w-4xl text-5xl font-black leading-[0.95] tracking-tight text-white sm:text-7xl lg:text-8xl">
+            <h1 className="max-w-4xl text-4xl font-black leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
               Your next motocross session, actually organized.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-neutral-300 sm:text-xl">

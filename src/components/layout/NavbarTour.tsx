@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Joyride, STATUS, EVENTS, ACTIONS } from 'react-joyride';
-import type { Step, EventData } from 'react-joyride';
+import type { Step, EventData, TooltipRenderProps } from 'react-joyride';
 import { useAuth } from '@/providers/useAuth';
 
 interface NavbarTourProps {
@@ -12,7 +12,9 @@ export function NavbarTour({ mobileOpen, setMobileOpen }: NavbarTourProps) {
   const { user } = useAuth();
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
 
   // 1. Detect screen size changes
   useEffect(() => {
@@ -256,7 +258,7 @@ function CustomTooltip({
   skipProps,
   tooltipProps,
   size,
-}: any) {
+}: TooltipRenderProps) {
   const progressPercent = ((index + 1) / size) * 100;
 
   return (
