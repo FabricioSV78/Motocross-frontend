@@ -85,6 +85,18 @@ export interface ApiError {
   errors?: Record<string, string[]>;
 }
 
+function getAuthErrorMessage(error: unknown, fallback: string): string {
+  const axiosError = error as AxiosError<ApiError>;
+  const apiError = axiosError.response?.data;
+  const rawMessage = apiError?.detail || apiError?.message;
+
+  if (rawMessage === 'Email is already registered') {
+    return 'This email is already registered. Try signing in or use a different email address.';
+  }
+
+  return rawMessage || fallback;
+}
+
 /**
  * API de autenticación
  */
@@ -105,14 +117,12 @@ export const authApi = {
       
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<ApiError>;
-      const apiError = axiosError.response?.data;
-      const errorMessage = 
-        apiError?.detail || 
-        apiError?.message || 
-        'Error registering user. Try again.';
-      
-      throw new Error(errorMessage);
+      throw new Error(
+        getAuthErrorMessage(
+          error,
+          'We could not create your account. Please check your details and try again.',
+        ),
+      );
     }
   },
 
@@ -133,14 +143,12 @@ export const authApi = {
       
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<ApiError>;
-      const apiError = axiosError.response?.data;
-      const errorMessage = 
-        apiError?.detail || 
-        apiError?.message || 
-        'Error registering company. Try again.';
-      
-      throw new Error(errorMessage);
+      throw new Error(
+        getAuthErrorMessage(
+          error,
+          'We could not register your company. Please check your details and try again.',
+        ),
+      );
     }
   },
 
@@ -212,13 +220,12 @@ export const authApi = {
       });
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<ApiError>;
-      const apiError = axiosError.response?.data;
-      const errorMessage =
-        apiError?.detail ||
-        apiError?.message ||
-        'Failed to register coach. Please try again.';
-      throw new Error(errorMessage);
+      throw new Error(
+        getAuthErrorMessage(
+          error,
+          'We could not create your coach account. Please check your details and try again.',
+        ),
+      );
     }
   },
 
