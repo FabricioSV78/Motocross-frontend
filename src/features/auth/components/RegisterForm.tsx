@@ -65,64 +65,68 @@ export function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {apiError && (
         <AuthAlert variant="error" title="Could not create account">
           {apiError}
         </AuthAlert>
       )}
 
-      <AuthFormSection title="Your details">
-        <Input
-          label="Full name"
-          placeholder="John Smith"
-          error={errors.nombre?.message}
-          fullWidth
-          required
-          disabled={isLoading}
-          {...register('nombre')}
-        />
-        <Input
-          label="Email"
-          type="email"
-          placeholder="you@example.com"
-          error={errors.email?.message}
-          fullWidth
-          required
-          autoComplete="email"
-          disabled={isLoading}
-          {...register('email')}
-        />
-      </AuthFormSection>
+      <div className="space-y-5">
+        <AuthFormSection title="Your details">
+          <Input
+            label="Full name"
+            placeholder="John Smith"
+            error={errors.nombre?.message}
+            fullWidth
+            required
+            disabled={isLoading}
+            {...register('nombre')}
+          />
+          <Input
+            label="Email"
+            type="email"
+            placeholder="you@example.com"
+            error={errors.email?.message}
+            fullWidth
+            required
+            autoComplete="email"
+            disabled={isLoading}
+            {...register('email')}
+          />
+        </AuthFormSection>
 
-      <AuthFormSection title="Security" description="Minimum 8 characters">
-        <Input
-          label="Password"
-          type="password"
-          placeholder="Create a password"
-          error={errors.password?.message}
-          fullWidth
-          required
-          autoComplete="new-password"
-          disabled={isLoading}
-          {...register('password')}
-        />
-        <Input
-          label="Confirm password"
-          type="password"
-          placeholder="Repeat password"
-          error={errors.confirmPassword?.message}
-          fullWidth
-          required
-          autoComplete="new-password"
-          disabled={isLoading}
-          {...register('confirmPassword')}
-        />
-      </AuthFormSection>
+        <AuthFormSection title="Security" description="Minimum 8 characters">
+          <Input
+            label="Password"
+            type="password"
+            placeholder="Create a password"
+            error={errors.password?.message}
+            fullWidth
+            required
+            autoComplete="new-password"
+            disabled={isLoading}
+            {...register('password')}
+          />
+          <Input
+            label="Confirm password"
+            type="password"
+            placeholder="Repeat password"
+            error={errors.confirmPassword?.message}
+            fullWidth
+            required
+            autoComplete="new-password"
+            disabled={isLoading}
+            {...register('confirmPassword')}
+          />
+        </AuthFormSection>
+      </div>
 
-      <Button type="submit" variant="primary" size="lg" fullWidth isLoading={isLoading} disabled={isLoading}>
-        {isLoading ? 'Creating account...' : 'Create rider account'}
-      </Button>
+      <div className="pt-1">
+        <Button type="submit" variant="primary" size="lg" fullWidth isLoading={isLoading} disabled={isLoading}>
+          {isLoading ? 'Creating account...' : 'Create rider account'}
+        </Button>
+      </div>
     </form>
   );
 }

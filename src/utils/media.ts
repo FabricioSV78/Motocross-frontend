@@ -1,4 +1,4 @@
-import { env } from '@/config/env';
+import { env, normalizeUrlForCurrentPage } from '@/config/env';
 
 // Derive the backend origin from the API URL (e.g. 'http://localhost:8000/api/v1' → 'http://localhost:8000')
 const BACKEND_ORIGIN = env.API_URL.replace(/\/api\/v1\/?$/, '');
@@ -15,6 +15,6 @@ const BACKEND_ORIGIN = env.API_URL.replace(/\/api\/v1\/?$/, '');
  */
 export const getMediaUrl = (path: string | null | undefined): string | null => {
   if (!path) return null;
-  if (path.startsWith('http')) return path; // legacy absolute URL — keep as-is
+  if (path.startsWith('http')) return normalizeUrlForCurrentPage(path);
   return `${BACKEND_ORIGIN}${path}`;
 };

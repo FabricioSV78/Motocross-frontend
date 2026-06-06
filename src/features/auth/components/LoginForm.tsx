@@ -31,7 +31,7 @@ export function LoginForm({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {error && (
         <AuthAlert variant="error" title="Sign-in failed">
           {error}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type KeyboardEvent } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -16,6 +16,19 @@ L.Icon.Default.mergeOptions({
 });
 
 const DEFAULT_CENTER: [number, number] = [-33.4489, -70.6693];
+const GEOCODE_ENDPOINT = 'https://nominatim.openstreetmap.org/search';
+const GEOLOCATION_OPTIONS: PositionOptions = {
+  enableHighAccuracy: true,
+  timeout: 12_000,
+  maximumAge: 30_000,
+};
+
+interface GeocodeResult {
+  place_id: number;
+  display_name: string;
+  lat: string;
+  lon: string;
+}
 
 interface TrackLocationPickerProps {
   latitude: string;
@@ -33,6 +46,9 @@ export function TrackLocationPicker({
   error,
 }: TrackLocationPickerProps) {
   const [geoStatus, setGeoStatus] = useState<'idle' | 'loading' | 'denied'>('idle');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchStatus, setSearchStatus] = useState<'idle' | 'loading' | 'error' | 'empty'>('idle');
+  const [searchResults, setSearchResults] = useState<GeocodeResult[]>([]);
 
   const latNum = parseFloat(latitude);
   const lngNum = parseFloat(longitude);
@@ -42,6 +58,60 @@ export function TrackLocationPicker({
   function setCoords(lat: number, lng: number) {
     onLatitudeChange(lat.toFixed(6));
     onLongitudeChange(lng.toFixed(6));
+  }
+
+  async function searchLocation() {
+    const query = searchQuery.trim();
+    if (!query) {
+      setSearchResults([]);
+      setSearchStatus('empty');
+      return;
+    }
+
+    try {
+      setSearchStatus('loading');
+      const params = new URLSearchParams({
+        q: query,
+        format: 'jsonv2',
+        limit: '5',
+        addressdetails: '1',
+        'accept-language': 'en',
+      });
+      const response = await fetch(`${GEOCODE_ENDPOINT}?${params.toString()}`);
+
+      if (!response.ok) {
+        throw new Error('Location search failed');
+      }
+
+      const results = (await response.json()) as GeocodeResult[];
+      setSearchResults(results);
+      setSearchStatus(results.length > 0 ? 'idle' : 'empty');
+    } catch {
+      setSearchResults([]);
+      setSearchStatus('error');
+    }
+  }
+
+  function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key !== 'Enter') return;
+
+    event.preventDefault();
+    void searchLocation();
+  }
+
+  function selectSearchResult(result: GeocodeResult) {
+    const nextLat = Number(result.lat);
+    const nextLng = Number(result.lon);
+
+    if (!Number.isFinite(nextLat) || !Number.isFinite(nextLng)) {
+      setSearchStatus('error');
+      return;
+    }
+
+    setCoords(nextLat, nextLng);
+    setSearchQuery(result.display_name);
+    setSearchResults([]);
+    setSearchStatus('idle');
   }
 
   function useMyLocation() {
@@ -57,7 +127,7 @@ export function TrackLocationPicker({
         setGeoStatus('idle');
       },
       () => setGeoStatus('denied'),
-      { timeout: 10000, maximumAge: 60_000 },
+      GEOLOCATION_OPTIONS,
     );
   }
 
@@ -73,7 +143,7 @@ export function TrackLocationPicker({
             Track location <span className="text-orange-400">*</span>
           </p>
           <p className="mt-0.5 text-xs text-slate-500 dark:text-gray-500">
-            Click the map, use GPS, or enter coordinates. Verify on Google Maps.
+            Search a city or address, click the map, use GPS, or enter coordinates.
           </p>
         </div>
         <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>
@@ -86,6 +156,57 @@ export function TrackLocationPicker({
           GPS unavailable. Click the map or enter latitude and longitude manually.
         </p>
       )}
+
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-900/60">
+        <label htmlFor="track-location-search" className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">
+          Search by city or address
+        </label>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <input
+            id="track-location-search"
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            onKeyDown={handleSearchKeyDown}
+            placeholder="e.g. Trujillo, Peru"
+            className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-slate-500"
+          />
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={searchStatus === 'loading'}
+            onClick={() => void searchLocation()}
+          >
+            {searchStatus === 'loading' ? 'Searching...' : 'Search'}
+          </Button>
+        </div>
+
+        {searchStatus === 'empty' && (
+          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+            No locations found. Try adding the country or region.
+          </p>
+        )}
+        {searchStatus === 'error' && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-300">
+            Location search is unavailable right now. You can still click the map or enter coordinates.
+          </p>
+        )}
+        {searchResults.length > 0 && (
+          <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950">
+            {searchResults.map((result) => (
+              <button
+                key={result.place_id}
+                type="button"
+                onClick={() => selectSearchResult(result)}
+                className="block w-full border-b border-slate-100 px-3 py-2 text-left text-sm text-slate-700 transition last:border-b-0 hover:bg-orange-50 hover:text-orange-700 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-orange-500/10 dark:hover:text-orange-200"
+              >
+                {result.display_name}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="h-56 overflow-hidden rounded-xl border border-slate-300 dark:border-gray-700 sm:h-64">
         <MapContainer

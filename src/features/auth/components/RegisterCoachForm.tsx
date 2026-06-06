@@ -73,87 +73,91 @@ export function RegisterCoachForm() {
     'w-full resize-none rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-950 placeholder-slate-400 shadow-sm transition focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/25 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:placeholder-slate-500 dark:focus:ring-orange-500/30';
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {apiError && (
         <AuthAlert variant="error" title="Could not create account">
           {apiError}
         </AuthAlert>
       )}
 
-      <AuthFormSection title="Profile">
-        <Input
-          label="Full name"
-          placeholder="John Rider"
-          error={errors.nombre?.message}
-          fullWidth
-          required
-          disabled={isLoading}
-          {...register('nombre')}
-        />
-        <Input
-          label="Phone"
-          type="tel"
-          placeholder="+61 400 000 000"
-          error={errors.telefono?.message}
-          fullWidth
-          required
-          disabled={isLoading}
-          {...register('telefono')}
-        />
-        <div>
-          <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Experience (optional)</label>
-          <textarea
-            placeholder="Years coaching, certifications, specialties..."
-            rows={3}
-            className={`${textareaClass} mt-1.5`}
+      <div className="grid gap-6 md:grid-cols-2">
+        <AuthFormSection title="Profile">
+          <Input
+            label="Full name"
+            placeholder="John Rider"
+            error={errors.nombre?.message}
+            fullWidth
+            required
             disabled={isLoading}
-            {...register('experience')}
+            {...register('nombre')}
           />
-          {errors.experience && (
-            <p className="mt-1 text-xs text-red-600 dark:text-red-300">{errors.experience.message}</p>
-          )}
-        </div>
-      </AuthFormSection>
+          <Input
+            label="Phone"
+            type="tel"
+            placeholder="+61 400 000 000"
+            error={errors.telefono?.message}
+            fullWidth
+            required
+            disabled={isLoading}
+            {...register('telefono')}
+          />
+          <div>
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Experience (optional)</label>
+            <textarea
+              placeholder="Years coaching, certifications, specialties..."
+              rows={2}
+              className={`${textareaClass} mt-1.5`}
+              disabled={isLoading}
+              {...register('experience')}
+            />
+            {errors.experience && (
+              <p className="mt-1 text-xs text-red-600 dark:text-red-300">{errors.experience.message}</p>
+            )}
+          </div>
+        </AuthFormSection>
 
-      <AuthFormSection title="Account & security">
-        <Input
-          label="Email"
-          type="email"
-          placeholder="coach@example.com"
-          error={errors.email?.message}
-          fullWidth
-          required
-          autoComplete="email"
-          disabled={isLoading}
-          {...register('email')}
-        />
-        <Input
-          label="Password"
-          type="password"
-          placeholder="Minimum 8 characters"
-          error={errors.password?.message}
-          fullWidth
-          required
-          autoComplete="new-password"
-          disabled={isLoading}
-          {...register('password')}
-        />
-        <Input
-          label="Confirm password"
-          type="password"
-          placeholder="Repeat password"
-          error={errors.confirmPassword?.message}
-          fullWidth
-          required
-          autoComplete="new-password"
-          disabled={isLoading}
-          {...register('confirmPassword')}
-        />
-      </AuthFormSection>
+        <AuthFormSection title="Account & security">
+          <Input
+            label="Email"
+            type="email"
+            placeholder="coach@example.com"
+            error={errors.email?.message}
+            fullWidth
+            required
+            autoComplete="email"
+            disabled={isLoading}
+            {...register('email')}
+          />
+          <Input
+            label="Password"
+            type="password"
+            placeholder="Minimum 8 characters"
+            error={errors.password?.message}
+            fullWidth
+            required
+            autoComplete="new-password"
+            disabled={isLoading}
+            {...register('password')}
+          />
+          <Input
+            label="Confirm password"
+            type="password"
+            placeholder="Repeat password"
+            error={errors.confirmPassword?.message}
+            fullWidth
+            required
+            autoComplete="new-password"
+            disabled={isLoading}
+            {...register('confirmPassword')}
+          />
+        </AuthFormSection>
+      </div>
 
-      <Button type="submit" variant="primary" size="lg" fullWidth isLoading={isLoading} disabled={isLoading}>
-        {isLoading ? 'Creating account...' : 'Continue to certificate upload'}
-      </Button>
+      <div className="pt-1">
+        <Button type="submit" variant="primary" size="lg" fullWidth isLoading={isLoading} disabled={isLoading}>
+          {isLoading ? 'Creating account...' : 'Continue to certificate upload'}
+        </Button>
+      </div>
     </form>
   );
 }

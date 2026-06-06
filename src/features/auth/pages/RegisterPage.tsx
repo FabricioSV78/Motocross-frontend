@@ -12,7 +12,7 @@ export function RegisterPage() {
   const navigate = useNavigate();
 
   const footer = (label: string) => (
-    <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+    <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
       {label}{' '}
       <Link
         to={ROUTES.LOGIN}
@@ -34,7 +34,7 @@ export function RegisterPage() {
         <button
           type="button"
           onClick={() => setSelectedRole(null)}
-          className="mb-4 text-sm font-semibold text-slate-500 transition-colors hover:text-orange-600 dark:text-slate-400 dark:hover:text-orange-300"
+          className="mb-3 text-sm font-semibold text-slate-500 transition-colors hover:text-orange-600 dark:text-slate-400 dark:hover:text-orange-300"
         >
           Back to account types
         </button>
@@ -52,7 +52,7 @@ export function RegisterPage() {
       maxWidth="2xl"
       footer={footer('Already have an account?')}
     >
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-3 md:grid-cols-3">
         <RoleSelectCard
           title="Rider"
           description="Find tracks on the map and book sessions with or without a coach."

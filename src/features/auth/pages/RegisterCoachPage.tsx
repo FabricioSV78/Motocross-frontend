@@ -9,9 +9,10 @@ export function RegisterCoachPage() {
     <AuthLayout
       title="Register as coach"
       subtitle="Create your profile and upload your certificate to start teaching."
+      maxWidth="2xl"
       backLink={{ to: ROUTES.REGISTER, label: 'Back to account types' }}
       footer={
-        <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
           Already have an account?{' '}
           <Link
             to={ROUTES.LOGIN}
@@ -26,7 +27,7 @@ export function RegisterCoachPage() {
         <RegisterCoachForm />
       </AuthCard>
 
-      <div className="mt-4">
+      <div className="mt-3">
         <AuthAlert variant="info" title="Next step after signup">
           You will upload your coaching certificate. An admin must approve your profile before you
           can accept bookings.

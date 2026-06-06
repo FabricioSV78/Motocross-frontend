@@ -77,7 +77,7 @@ export function RegisterCompanyForm() {
   const disabled = isLoading || !!successMessage;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {successMessage && (
         <AuthAlert variant="success" title="Registration submitted">
           {successMessage}
@@ -89,72 +89,73 @@ export function RegisterCompanyForm() {
         </AuthAlert>
       )}
 
-      <AuthFormSection title="Company">
-        <Input
-          label="Company name"
-          placeholder="Motocross Park Pty Ltd"
-          error={errors.nombre_empresa?.message}
-          fullWidth
-          required
-          disabled={disabled}
-          {...register('nombre_empresa')}
-        />
-        <Input
-          label="Business phone"
-          type="tel"
-          placeholder="+61 400 000 000"
-          helperText="Include country code if needed"
-          error={errors.telefono?.message}
-          fullWidth
-          required
-          disabled={disabled}
-          {...register('telefono')}
-        />
-      </AuthFormSection>
+      <div className="grid gap-6 md:grid-cols-2">
+        <AuthFormSection title="Company">
+          <Input
+            label="Company name"
+            placeholder="Motocross Park Pty Ltd"
+            error={errors.nombre_empresa?.message}
+            fullWidth
+            required
+            disabled={disabled}
+            {...register('nombre_empresa')}
+          />
+          <Input
+            label="Business phone"
+            type="tel"
+            placeholder="+61 400 000 000"
+            helperText="Include country code if needed"
+            error={errors.telefono?.message}
+            fullWidth
+            required
+            disabled={disabled}
+            {...register('telefono')}
+          />
+        </AuthFormSection>
 
-      <AuthFormSection title="Account">
-        <Input
-          label="Email"
-          type="email"
-          placeholder="company@example.com"
-          error={errors.email?.message}
-          fullWidth
-          required
-          autoComplete="email"
-          disabled={disabled}
-          {...register('email')}
-        />
-      </AuthFormSection>
-
-      <AuthFormSection title="Security">
-        <Input
-          label="Password"
-          type="password"
-          placeholder="Minimum 8 characters"
-          error={errors.password?.message}
-          fullWidth
-          required
-          autoComplete="new-password"
-          disabled={disabled}
-          {...register('password')}
-        />
-        <Input
-          label="Confirm password"
-          type="password"
-          placeholder="Repeat password"
-          error={errors.confirmPassword?.message}
-          fullWidth
-          required
-          autoComplete="new-password"
-          disabled={disabled}
-          {...register('confirmPassword')}
-        />
-      </AuthFormSection>
+        <AuthFormSection title="Account & security">
+          <Input
+            label="Email"
+            type="email"
+            placeholder="company@example.com"
+            error={errors.email?.message}
+            fullWidth
+            required
+            autoComplete="email"
+            disabled={disabled}
+            {...register('email')}
+          />
+          <Input
+            label="Password"
+            type="password"
+            placeholder="Minimum 8 characters"
+            error={errors.password?.message}
+            fullWidth
+            required
+            autoComplete="new-password"
+            disabled={disabled}
+            {...register('password')}
+          />
+          <Input
+            label="Confirm password"
+            type="password"
+            placeholder="Repeat password"
+            error={errors.confirmPassword?.message}
+            fullWidth
+            required
+            autoComplete="new-password"
+            disabled={disabled}
+            {...register('confirmPassword')}
+          />
+        </AuthFormSection>
+      </div>
 
       {!successMessage && (
-        <Button type="submit" variant="primary" size="lg" fullWidth isLoading={isLoading} disabled={isLoading}>
-          {isLoading ? 'Submitting...' : 'Create company account'}
-        </Button>
+        <div className="pt-1">
+          <Button type="submit" variant="primary" size="lg" fullWidth isLoading={isLoading} disabled={isLoading}>
+            {isLoading ? 'Submitting...' : 'Create company account'}
+          </Button>
+        </div>
       )}
     </form>
   );

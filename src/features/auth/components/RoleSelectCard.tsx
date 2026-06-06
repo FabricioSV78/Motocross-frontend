@@ -40,11 +40,11 @@ export function RoleSelectCard({
     <button
       type="button"
       onClick={onClick}
-      className={`group w-full rounded-2xl border border-slate-200/90 bg-white/85 p-6 text-left shadow-xl shadow-slate-200/60 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white dark:border-slate-700/80 dark:bg-slate-900/50 dark:shadow-black/20 dark:hover:bg-slate-900/80 ${styles.border}`}
+      className={`group w-full rounded-2xl border border-slate-200/90 bg-white/85 p-4 text-left shadow-xl shadow-slate-200/60 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white dark:border-slate-700/80 dark:bg-slate-900/50 dark:shadow-black/20 dark:hover:bg-slate-900/80 sm:p-5 ${styles.border}`}
     >
-      <span className={`mb-4 inline-block h-2 w-2 rounded-full ${styles.dot}`} />
+      <span className={`mb-3 inline-block h-2 w-2 rounded-full ${styles.dot}`} />
       <h3 className="mb-2 text-lg font-bold text-slate-950 dark:text-white">{title}</h3>
-      <p className="mb-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{description}</p>
+      <p className="mb-3 text-sm leading-6 text-slate-600 dark:text-slate-400">{description}</p>
       <span className={`inline-block rounded-lg border px-3 py-1.5 text-xs font-bold ${styles.badge}`}>
         {actionLabel} -&gt;
       </span>

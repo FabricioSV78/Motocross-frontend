@@ -67,7 +67,7 @@ export function LoginPage() {
       title="Sign in"
       subtitle="Access your dashboard to manage tracks, bookings, or lessons."
       footer={
-        <p className="text-center text-gray-500 text-sm mt-8">
+        <p className="mt-4 text-center text-sm text-gray-500">
           Don&apos;t have an account?{' '}
           <Link to={ROUTES.REGISTER} className="text-orange-400 hover:text-orange-300 font-medium">
             Create account
@@ -81,7 +81,7 @@ export function LoginPage() {
         </AuthAlert>
       )}
 
-      <AuthCard className="mt-6">
+      <AuthCard className="mt-4">
         <LoginForm
           onSubmit={handleLogin}
           isLoading={isLoading}

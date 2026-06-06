@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MapContainer, Marker, Popup, TileLayer, ZoomControl, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
@@ -67,6 +67,11 @@ const DIFFICULTY_FILTERS = [
 ] as const;
 
 const DEFAULT_CENTER: [number, number] = [-33.4489, -70.6693];
+const GEOLOCATION_OPTIONS: PositionOptions = {
+  enableHighAccuracy: true,
+  timeout: 15_000,
+  maximumAge: 30_000,
+};
 
 function getLevelMeta(level: string) {
   return LEVEL_META[level] ?? LEVEL_META.BEGINNER;
@@ -160,11 +165,13 @@ function TrackMarkers({
   tracks,
   selectedTrackId,
   isDark,
+  distanceByTrackId,
   onSelect,
 }: {
   tracks: TrackMapItem[];
   selectedTrackId: number | null;
   isDark: boolean;
+  distanceByTrackId: Record<number, number>;
   onSelect: (track: TrackMapItem) => void;
 }) {
   const navigate = useNavigate();
@@ -203,7 +210,14 @@ function TrackMarkers({
 
                 <div className="grid grid-cols-2 gap-1.5">
                   <PopupMetric label="From" value={`$${formatTrackPrice(track.price)}`} />
-                  <PopupMetric label="Level" value={level.label} />
+                  <PopupMetric
+                    label={distanceByTrackId[track.id] != null ? 'Distance' : 'Level'}
+                    value={
+                      distanceByTrackId[track.id] != null
+                        ? formatDistance(distanceByTrackId[track.id])
+                        : level.label
+                    }
+                  />
                 </div>
 
                 <Button
@@ -246,6 +260,23 @@ export function MapPage() {
   const [difficulty, setDifficulty] = useState<string>('ALL');
   const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
 
+  const requestUserLocation = useCallback(() => {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setGeoStatus('denied');
+      return;
+    }
+
+    setGeoStatus('pending');
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setUserPos([coords.latitude, coords.longitude]);
+        setGeoStatus('granted');
+      },
+      () => setGeoStatus('denied'),
+      GEOLOCATION_OPTIONS,
+    );
+  }, []);
+
   useEffect(() => {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       return;
@@ -257,7 +288,7 @@ export function MapPage() {
         setGeoStatus('granted');
       },
       () => setGeoStatus('denied'),
-      { timeout: 8000, maximumAge: 60_000 },
+      GEOLOCATION_OPTIONS,
     );
   }, []);
 
@@ -282,25 +313,42 @@ export function MapPage() {
     });
   }, [tracks, search, difficulty]);
 
+  const distanceByTrackId = useMemo(() => {
+    if (!userPos) return {};
+
+    return filteredTracks.reduce<Record<number, number>>((acc, track) => {
+      acc[track.id] = calculateDistanceKm(userPos, [track.lat, track.lng]);
+      return acc;
+    }, {});
+  }, [filteredTracks, userPos]);
+
+  const visibleTracks = useMemo(() => {
+    if (!userPos) return filteredTracks;
+
+    return [...filteredTracks].sort(
+      (a, b) => distanceByTrackId[a.id] - distanceByTrackId[b.id],
+    );
+  }, [distanceByTrackId, filteredTracks, userPos]);
+
   const effectiveSelectedTrackId =
-    selectedTrackId != null && filteredTracks.some((track) => track.id === selectedTrackId)
+    selectedTrackId != null && visibleTracks.some((track) => track.id === selectedTrackId)
       ? selectedTrackId
       : null;
 
   const selectedTrack = useMemo(
-    () => filteredTracks.find((track) => track.id === effectiveSelectedTrackId) ?? null,
-    [effectiveSelectedTrackId, filteredTracks],
+    () => visibleTracks.find((track) => track.id === effectiveSelectedTrackId) ?? null,
+    [effectiveSelectedTrackId, visibleTracks],
   );
-
-  const averagePrice = useMemo(() => {
-    if (filteredTracks.length === 0) return 0;
-    return filteredTracks.reduce((sum, track) => sum + track.price, 0) / filteredTracks.length;
-  }, [filteredTracks]);
 
   const lowestPrice = useMemo(() => {
     if (filteredTracks.length === 0) return null;
     return Math.min(...filteredTracks.map((track) => track.price));
   }, [filteredTracks]);
+
+  const nearestDistance = useMemo(() => {
+    if (!userPos || visibleTracks.length === 0) return null;
+    return distanceByTrackId[visibleTracks[0].id] ?? null;
+  }, [distanceByTrackId, userPos, visibleTracks]);
 
   const difficultyCounts = useMemo(
     () =>
@@ -323,19 +371,19 @@ export function MapPage() {
   const selectedTile = isDark ? MAP_TILES.dark : MAP_TILES.light;
 
   return (
-    <div className="relative left-1/2 -my-8 h-[calc(100svh-4rem)] min-h-[680px] w-screen -translate-x-1/2 overflow-hidden bg-slate-100 text-slate-950 dark:bg-slate-950 dark:text-white">
-      <div className="grid h-full grid-rows-[minmax(440px,64svh)_minmax(0,1fr)] md:grid-cols-[360px_minmax(0,1fr)] md:grid-rows-1 xl:grid-cols-[400px_minmax(0,1fr)] 2xl:grid-cols-[430px_minmax(0,1fr)]">
+    <div className="relative h-full min-h-0 w-full overflow-hidden bg-slate-100 text-slate-950 dark:bg-slate-950 dark:text-white">
+      <div className="grid h-full min-h-0 grid-rows-[minmax(320px,52svh)_minmax(0,1fr)] md:grid-cols-[minmax(320px,360px)_minmax(0,1fr)] md:grid-rows-1 xl:grid-cols-[400px_minmax(0,1fr)] 2xl:grid-cols-[430px_minmax(0,1fr)]">
         <aside className="order-2 flex min-h-0 flex-col border-t border-slate-200 bg-white/94 shadow-2xl shadow-slate-200/60 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/94 dark:shadow-black/30 md:order-1 md:border-r md:border-t-0">
-          <header className="border-b border-slate-200 px-4 py-4 dark:border-slate-800 xl:px-5 xl:py-5">
+          <header className="shrink-0 border-b border-slate-200 px-4 py-3 dark:border-slate-800 xl:px-5 xl:py-5">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-orange-600 dark:text-orange-400">
                   Track explorer
                 </p>
-                <h1 className="mt-2 text-2xl font-black tracking-tight text-slate-950 dark:text-white">
+                <h1 className="mt-2 text-xl font-black tracking-tight text-slate-950 dark:text-white xl:text-2xl">
                   Find a track
                 </h1>
-                <p className="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">
+                <p className="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400 max-sm:hidden">
                   Search, filter, preview, then open the track to book.
                 </p>
               </div>
@@ -346,14 +394,14 @@ export function MapPage() {
               )}
             </div>
 
-            <div className="mt-5 grid grid-cols-3 gap-2">
+            <div className="mt-4 grid grid-cols-3 gap-2 xl:mt-5">
               <StatCard label="Shown" value={`${filteredTracks.length}/${tracks.length}`} />
+              <StatCard label="Nearest" value={nearestDistance != null ? formatDistance(nearestDistance) : '-'} />
               <StatCard label="Lowest price" value={lowestPrice != null ? `$${formatTrackPrice(lowestPrice)}` : '-'} />
-              <StatCard label="Avg price" value={averagePrice ? `$${formatTrackPrice(averagePrice)}` : '-'} />
             </div>
           </header>
 
-          <div className="border-b border-slate-200 px-4 py-4 dark:border-slate-800 xl:px-5">
+          <div className="shrink-0 border-b border-slate-200 px-4 py-3 dark:border-slate-800 xl:px-5 xl:py-4">
             <label className="sr-only" htmlFor="track-search">
               Search tracks
             </label>
@@ -371,7 +419,7 @@ export function MapPage() {
               />
             </div>
 
-            <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {DIFFICULTY_FILTERS.map((filter) => {
                 const active = difficulty === filter.value;
                 return (
@@ -396,7 +444,7 @@ export function MapPage() {
             </div>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 xl:px-5">
+          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 xl:px-5 xl:py-4">
             {isLoading && <TrackListSkeleton />}
 
             {isError && (
@@ -422,13 +470,14 @@ export function MapPage() {
               />
             )}
 
-            {!isLoading && !isError && filteredTracks.length > 0 && (
+            {!isLoading && !isError && visibleTracks.length > 0 && (
               <div className="space-y-3">
-                {filteredTracks.map((track) => (
+                {visibleTracks.map((track) => (
                   <TrackResultCard
                     key={track.id}
                     track={track}
                     selected={track.id === effectiveSelectedTrackId}
+                    distanceKm={distanceByTrackId[track.id]}
                     onFocus={() => setSelectedTrackId(track.id)}
                     onOpen={() => navigate(ROUTES.TRACK_DETAIL(String(track.id)))}
                   />
@@ -439,24 +488,35 @@ export function MapPage() {
         </aside>
 
         <section className="relative order-1 min-h-0 overflow-hidden bg-slate-200 dark:bg-slate-900 md:order-2">
-          <div className="absolute left-4 right-4 top-4 z-[1000] flex flex-wrap items-center justify-between gap-3 xl:left-5 xl:right-5">
-            <div className="rounded-2xl border border-white/70 bg-white/88 px-4 py-3 shadow-xl shadow-slate-300/40 backdrop-blur-xl dark:border-slate-700/80 dark:bg-slate-950/86 dark:shadow-black/30">
+          <div className="absolute left-3 right-3 top-3 z-[1000] flex flex-wrap items-center justify-between gap-2 xl:left-5 xl:right-5 xl:top-4">
+            <div className="max-w-full rounded-2xl border border-white/70 bg-white/88 px-3 py-2 shadow-xl shadow-slate-300/40 backdrop-blur-xl dark:border-slate-700/80 dark:bg-slate-950/86 dark:shadow-black/30 sm:px-4 sm:py-3">
               <p className="text-sm font-bold text-slate-950 dark:text-white">
                 {filteredTracks.length} tracks visible
               </p>
-              <div className="mt-1 flex flex-wrap items-center gap-3 text-xs font-medium text-slate-500 dark:text-slate-400">
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400 sm:gap-3">
                 <span className="inline-flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-orange-500" />
                   Lowest-price pins
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-blue-600" />
-                  {geoStatus === 'granted' ? 'Your location' : 'Location optional'}
+                  {geoStatus === 'granted'
+                    ? 'GPS active'
+                    : geoStatus === 'pending'
+                      ? 'Finding GPS'
+                      : 'GPS optional'}
                 </span>
               </div>
             </div>
 
             <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={requestUserLocation}
+                className="rounded-full border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 shadow-lg shadow-slate-300/30 backdrop-blur-xl transition hover:border-blue-300 hover:bg-blue-100 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-blue-400/30 dark:bg-blue-500/15 dark:text-blue-200 dark:shadow-black/30 dark:hover:border-blue-300/50 dark:hover:bg-blue-500/25 dark:hover:text-blue-100"
+              >
+                {geoStatus === 'granted' ? 'Update GPS' : 'Use my GPS'}
+              </button>
               {(search || difficulty !== 'ALL') && (
                 <button
                   type="button"
@@ -516,15 +576,16 @@ export function MapPage() {
             />
             <ZoomControl position="bottomright" />
             <MapViewport
-              tracks={filteredTracks}
+              tracks={visibleTracks}
               selectedTrack={selectedTrack}
               userPos={userPos}
             />
-            {filteredTracks.length > 0 && (
+            {visibleTracks.length > 0 && (
               <TrackMarkers
-                tracks={filteredTracks}
+                tracks={visibleTracks}
                 selectedTrackId={effectiveSelectedTrackId}
                 isDark={isDark}
+                distanceByTrackId={distanceByTrackId}
                 onSelect={(track) => setSelectedTrackId(track.id)}
               />
             )}
@@ -558,11 +619,13 @@ function StatCard({ label, value }: { label: string; value: string }) {
 function TrackResultCard({
   track,
   selected,
+  distanceKm,
   onFocus,
   onOpen,
 }: {
   track: TrackMapItem;
   selected: boolean;
+  distanceKm?: number;
   onFocus: () => void;
   onOpen: () => void;
 }) {
@@ -585,6 +648,11 @@ function TrackResultCard({
             </h2>
             <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
               From <span className="font-bold text-slate-800 dark:text-slate-200">${formatTrackPrice(track.price)}</span> USD
+              {distanceKm != null && (
+                <span className="ml-2 font-bold text-blue-600 dark:text-blue-300">
+                  {formatDistance(distanceKm)}
+                </span>
+              )}
             </p>
           </div>
         </div>
@@ -660,4 +728,27 @@ function TrackListSkeleton() {
 function formatTrackPrice(price: number) {
   if (Number.isInteger(price)) return String(price);
   return price.toFixed(2).replace(/\.?0+$/, '');
+}
+
+function calculateDistanceKm(from: [number, number], to: [number, number]) {
+  const earthRadiusKm = 6371;
+  const lat1 = toRadians(from[0]);
+  const lat2 = toRadians(to[0]);
+  const deltaLat = toRadians(to[0] - from[0]);
+  const deltaLng = toRadians(to[1] - from[1]);
+  const a =
+    Math.sin(deltaLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLng / 2) ** 2;
+
+  return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function toRadians(value: number) {
+  return (value * Math.PI) / 180;
+}
+
+function formatDistance(distanceKm: number) {
+  if (distanceKm < 1) return `${Math.round(distanceKm * 1000)} m`;
+  if (distanceKm < 10) return `${distanceKm.toFixed(1)} km`;
+  return `${Math.round(distanceKm)} km`;
 }

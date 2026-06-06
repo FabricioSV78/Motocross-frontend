@@ -368,7 +368,7 @@ export function TrackAvailabilityPage() {
   }
 
   return (
-    <div className="relative left-1/2 -my-8 flex h-[calc(100svh-4rem)] min-h-[720px] w-screen -translate-x-1/2 flex-col gap-3 overflow-hidden bg-slate-100 px-4 py-4 text-slate-950 dark:bg-slate-950 dark:text-white sm:px-6 xl:px-8">
+    <div className="flex h-full min-h-0 w-full flex-col gap-3 overflow-hidden bg-slate-100 px-4 py-4 text-slate-950 dark:bg-slate-950 dark:text-white sm:px-6 xl:px-8">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <h1 className="truncate text-2xl font-semibold text-slate-950 dark:text-white sm:text-3xl">
@@ -1029,7 +1029,7 @@ function MiniStat({ label, value }: { label: string; value: string }) {
 
 function TrackAvailabilitySkeleton() {
   return (
-    <div className="relative left-1/2 -my-8 flex h-[calc(100svh-4rem)] min-h-[720px] w-screen -translate-x-1/2 flex-col gap-3 overflow-hidden bg-slate-100 px-4 py-4 dark:bg-slate-950 sm:px-6 xl:px-8">
+    <div className="flex h-full min-h-0 w-full flex-col gap-3 overflow-hidden bg-slate-100 px-4 py-4 dark:bg-slate-950 sm:px-6 xl:px-8">
       <div className="flex items-end justify-between gap-3">
         <div className="space-y-3">
           <div className="h-9 w-64 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />

@@ -20,6 +20,33 @@ function getEnvVar(key: string, fallback?: string): string {
   return value;
 }
 
+function isLocalHost(hostname: string): boolean {
+  return ['localhost', '127.0.0.1', '::1'].includes(hostname);
+}
+
+export function normalizeUrlForCurrentPage(value: string): string {
+  const trimmed = value.trim();
+
+  try {
+    const url = new URL(trimmed);
+    const isHttpsPage =
+      typeof window !== 'undefined' && window.location.protocol === 'https:';
+
+    if (isHttpsPage && url.protocol === 'http:' && !isLocalHost(url.hostname)) {
+      url.protocol = 'https:';
+      return url.toString().replace(/\/$/, '');
+    }
+  } catch {
+    return trimmed;
+  }
+
+  return trimmed;
+}
+
+function normalizeApiUrl(value: string): string {
+  return normalizeUrlForCurrentPage(value).replace(/\/+$/, '');
+}
+
 /**
  * Variables de entorno tipadas y validadas
  * 
@@ -27,7 +54,7 @@ function getEnvVar(key: string, fallback?: string): string {
  * Ejemplo: VITE_API_URL=http://localhost:8000/api/v1
  */
 export const env: Env = {
-  API_URL: getEnvVar('API_URL', 'http://localhost:8000/api/v1'),
+  API_URL: normalizeApiUrl(getEnvVar('API_URL', 'http://localhost:8000/api/v1')),
   NODE_ENV: (import.meta.env.MODE as Env['NODE_ENV']) || 'development',
 };
 

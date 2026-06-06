@@ -42,7 +42,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         fullSized={fullWidth}
         disabled={disabled || isLoading}
         className={clsx(
-          'gap-2 whitespace-nowrap',
+          'min-w-0 justify-center gap-2 whitespace-normal text-center leading-tight sm:whitespace-nowrap',
           (variant === 'primary' || variant === 'danger') && 'theme-on-accent',
           variant === 'primary' && 'hover:-translate-y-0.5 hover:shadow-xl hover:shadow-orange-950/30',
           fullWidth && 'w-full',
