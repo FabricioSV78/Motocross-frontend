@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { env } from '@/config/env';
+import { env, normalizeUrlForCurrentPage } from '@/config/env';
 import { clearAuthStorage, getAuthToken } from '@/lib/authStorage';
 
 /**
  * Instancia configurada de Axios para todas las peticiones API
  */
 export const apiClient = axios.create({
-  baseURL: env.API_URL,
+  baseURL: normalizeUrlForCurrentPage(env.API_URL),
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -18,6 +18,12 @@ export const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config) => {
+    config.baseURL = normalizeUrlForCurrentPage(config.baseURL || env.API_URL);
+
+    if (config.url?.startsWith('http')) {
+      config.url = normalizeUrlForCurrentPage(config.url);
+    }
+
     const token = getAuthToken();
     
     if (token) {
