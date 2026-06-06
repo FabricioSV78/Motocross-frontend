@@ -96,6 +96,7 @@ function UnifiedProfileView({ role }: { role: 'PILOT' | 'COACH' }) {
   }
 
   const avatarUrl = getMediaUrl(profile.foto);
+  const bikePhotoUrl = getMediaUrl(profile.foto_moto);
   const initials = profile.nombre.charAt(0).toUpperCase();
   const badgeClass = STATUS_BADGE[profile.status ?? 'ACTIVE'] ?? 'bg-gray-700/30 border-gray-600 text-gray-400';
   const statusLabel = STATUS_LABELS[profile.status ?? 'ACTIVE'] ?? (profile.status ?? 'Active');
@@ -230,20 +231,22 @@ function UnifiedProfileView({ role }: { role: 'PILOT' | 'COACH' }) {
               <div className="bg-white dark:bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700/80 p-6 shadow-xl overflow-hidden">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">My Motorcycle</h3>
                 
-                {profile.moto ? (
+                {profile.moto || bikePhotoUrl ? (
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-gray-900/30 border border-gray-100 dark:border-gray-700/50 rounded-xl">
                       <span className="text-2xl">🏍️</span>
                       <div>
                         <p className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold">Motorcycle model</p>
-                        <p className="text-slate-800 dark:text-white font-bold">{profile.moto}</p>
+                        <p className="text-slate-800 dark:text-white font-bold">
+                          {profile.moto || 'Not specified'}
+                        </p>
                       </div>
                     </div>
 
                     <div className="relative h-64 w-full rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-                      {profile.foto_moto ? (
+                      {bikePhotoUrl ? (
                         <img
-                          src={getMediaUrl(profile.foto_moto) ?? undefined}
+                          src={bikePhotoUrl}
                           alt="Bike"
                           className="w-full h-full object-cover"
                         />
