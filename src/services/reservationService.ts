@@ -68,7 +68,7 @@ export const reservationService = {
     }
 
     const response = await apiClient.post<PaymentIntentResponse>(
-      '/reservations',
+      '/reservations/',
       requestBody
     );
     return response.data;
@@ -116,7 +116,7 @@ export const reservationService = {
   },
 
   async listMyReservations(): Promise<ReservationListItem[]> {
-    const response = await apiClient.get<ReservationListItem[]>('/reservations');
+    const response = await apiClient.get<ReservationListItem[]>('/reservations/');
     return response.data;
   },
 
